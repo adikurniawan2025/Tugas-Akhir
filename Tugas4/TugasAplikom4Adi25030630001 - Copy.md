@@ -1,0 +1,2766 @@
+﻿# Menggambar Grafik 2D dengan EMT
+Notebook ini menjelaskan tentang cara menggambar berbagaikurva dan
+grafik 2D dengan software EMT. EMT menyediakan fungsi plot2d() untuk
+menggambar berbagai kurva dan grafik dua dimensi (2D).
+
+
+## Basic Plots
+
+Ada beberapa fungsi paling dasar dari grafik. Ada koordinat layar,
+yang nilainya selalu berkisar dari 0 sampai 1024 di setiap sumbu,
+nggak peduli bentuk layarnya persegi atau bukan. Lalu ada koordinat
+grafik, yang bisa diatur pake setplot(). Pemetaan antara kedua
+koordinat ini tergantung pada jendela grafik yang lagi aktif.
+Contohnya, fungsi bawaan shrinkwindow() bakal nyediain ruang sisanya
+buat label sumbu dan judul grafik.
+
+
+Di contoh ini, kita cuma menggambar beberapa garis acak dengan
+berbagai warna. Buat detail fungsi-fungsi ini, kamu bisa pelajari
+fungsi inti dari EMT.
+
+
+\>clg; // clear screen
+
+\>window(0,0,1024,1024); // use all of the window
+
+\>setplot(0,1,0,1); // set plot coordinates
+
+\>hold on; // start overwrite mode
+
+\>n=100; X=random(n,2); Y=random(n,2);  // get random points
+
+\>colors=rgb(random(n),random(n),random(n)); // get random colors
+
+\>loop 1 to n; color(colors[#]); plot(X[#],Y[#]); end; // plot
+
+\>hold off; // end overwrite mode
+
+\>insimg; // insert to notebook
+
+
+![images/TugasAplikom4Adi25030630001-001.png](images/TugasAplikom4Adi25030630001-001.png)
+
+\>reset;
+
+
+Grafiknya perlu ditahan dulu (di-hold), soalnya perintah plot() bakal
+menghapus jendela grafik yang ada.
+
+
+Buat menghapus semua yang udah kita buat, kita pake reset().
+
+
+Untuk menampilkan gambar hasil plot di layar notebook, perintah
+plot2d() dapat diakhiri dengan titik dua (:). Cara lain adalah
+perintah plot2d() diakhiri dengan titik koma (;), kemudian menggunakan
+perintah insimg() untuk menampilkan gambar hasil plot.
+
+
+Sebagai contoh lain, kita menyisipkan sebuah grafik ke dalam grafik
+lain (inset). Ini dilakukan dengan mendefinisikan jendela grafik yang
+lebih kecil. Perhatikan bahwa jendela ini tidak menyediakan ruang
+untuk label sumbu di luar area grafik. Kita perlu menambahkan sedikit
+margin untuk itu sesuai kebutuhan. Perhatikan juga bahwa kita
+menyimpan dan mengembalikan tampilan jendela penuh (full window),
+serta menahan (hold) grafik yang sedang aktif saat kita menggambar
+grafik sisipan tersebut.
+
+
+\>reset()
+
+
+    0
+
+\>plot2d("x^3-x");
+
+\>plot2d("x^3-x");
+
+\>insimg()
+
+
+![images/TugasAplikom4Adi25030630001-002.png](images/TugasAplikom4Adi25030630001-002.png)
+
+\>xw=200; yw=100; ww=300; hw=300;
+
+\>ow=window();
+
+\>window(xw,yw,xw+ww,yw+hw);
+
+\>hold on;
+
+\>barclear(xw-50,yw-10,ww+60,ww+60);
+
+\>plot2d("x^4-x",grid=6):
+
+
+![images/TugasAplikom4Adi25030630001-003.png](images/TugasAplikom4Adi25030630001-003.png)
+
+\>hold off;
+
+\>window(ow);
+
+
+\>figure(2,2); ...  
+\>   for n=1 to 4; figure(n); plot2d("x^"+n); end; ...  
+\>   figure(0):
+
+
+![images/TugasAplikom4Adi25030630001-004.png](images/TugasAplikom4Adi25030630001-004.png)
+
+Untuk membuat grafik dengan beberapa gambar sekaligus, caranya sama
+saja. Ada fungsi bantuan figure() yang bisa dipakai untuk hal ini.
+
+
+## Aspek Plot
+
+Tampilan grafik bawaan menggunakan jendela grafik berbentuk persegi.
+Kamu bisa mengubahnya dengan fungsi aspect(). Jangan lupa untuk
+mengembalikan (reset) pengaturan aspeknya nanti. Kamu juga bisa
+mengubah nilai bawaan ini lewat menu pada opsi "Set Aspect" ke rasio
+aspek tertentu atau disesuaikan dengan ukuran jendela grafik saat ini.
+
+
+Tapi kamu juga bisa mengubahnya khusus untuk satu grafik saja.
+Caranya, ukuran area grafik yang sedang aktif akan diubah, lalu
+jendelanya disesuaikan supaya label grafik punya cukup ruang.
+
+
+\>aspect(2); // rasio panjang dan lebar 2:1
+
+\>plot2d(["sin(x)","cos(x)"],0,2pi):
+
+
+![images/TugasAplikom4Adi25030630001-005.png](images/TugasAplikom4Adi25030630001-005.png)
+
+\>aspect();
+
+\>reset;
+
+
+Fungsi reset() mengembalikan pengaturan bawaan grafik, termasuk rasio
+aspek (aspect ratio).
+
+
+# 2D Plots in Euler
+
+EMT Math Toolbox memiliki fitur grafik 2D, baik untuk data maupun
+fungsi. EMT menggunakan fungsi plot2d. Fungsi ini dapat memplot fungsi
+dan data.
+
+
+Kalian juga bisa membuat grafik di Maxima menggunakan Gnuplot atau di
+Python menggunakan Matplotlib.
+
+
+Euler dapat membuat grafik 2D untuk:
+
+
+* 
+ekspresi,
+* fungsi, variabel, atau kurva terparameterisasi,
+
+
+-vektor nilai x-y,
+
+
+-kumpulan titik (point cloud) pada bidang datar,
+
+
+-kurva implisit dengan level atau wilayah level (level regions),
+
+
+-fungsi kompleks.
+
+
+Gaya grafik mencakup berbagai opsi gaya untuk garis dan titik, grafik
+batang, serta grafik berarsir (shaded plots).
+
+
+# Plot Ekspresi atau Variabel
+
+Sebuah ekspresi tunggal dalam variabal "x" (misalnya "4*x^2") atau
+nama dari suatu fungsi (misalnya "f") akan menghasilkan grafik dari
+fungsi tersebut.
+
+
+Berikut adalah contoh paling dasar, yang menggunakan rentang bawaan
+(default range) dan menyesuaikan rentang sumbu-y agar cocok dengan
+grafik fungsi tersebut.
+
+
+Catatan: Jika kamu mengakhiri baris perintah dengan tanda titik dua
+":", grafik akan langsung disisipkan ke dalam jendela teks. Jika
+tidak, tekan tombol TAB untuk melihat grafik apabila jendela grafik
+tertutup.
+
+
+\>plot2d("x^2"):
+
+
+![images/TugasAplikom4Adi25030630001-006.png](images/TugasAplikom4Adi25030630001-006.png)
+
+\>aspect(1.5); plot2d("x^3-x"):
+
+
+![images/TugasAplikom4Adi25030630001-007.png](images/TugasAplikom4Adi25030630001-007.png)
+
+\>a:=5.6; plot2d("exp(-a\*x^2)/a"); insimg(30); // menampilkan gambar hasil plot setinggi 25 baris
+
+
+![images/TugasAplikom4Adi25030630001-008.png](images/TugasAplikom4Adi25030630001-008.png)
+
+Dari beberapa contoh sebelumnya Anda dapat melihat bahwa aslinya
+gambar plot menggunakan sumbu X dengan rentang nilai dari -2 sampai
+dengan 2. Untuk mengubah rentang nilai X dan Y, Anda dapat menambahkan
+nilai-nilai batas X (dan Y) di belakang ekspresi yang digambar.
+
+
+Rentang grafik (plot range) diatur menggunakan parameter-parameter
+berikut:
+
+
+* 
+a,b: rentang sumbu-x (bawaan: -2, 2)
+
+* 
+c,d: rentang sumbu-y (bawaan: menyesuaikan dengan nilai data)
+
+* 
+r: opsi alternatif berupa jari-jari (radius) di sekitar titik pusat
+* grafik
+
+* 
+cx,cy: koordinat titik pusat grafik (bawaan: 0,0)
+
+
+\>plot2d("x^3-x",-1,2):
+
+
+![images/TugasAplikom4Adi25030630001-009.png](images/TugasAplikom4Adi25030630001-009.png)
+
+\>plot2d("sin(x)",-2\*pi,2\*pi): // plot sin(x) pada interval [-2pi, 2pi]
+
+
+![images/TugasAplikom4Adi25030630001-010.png](images/TugasAplikom4Adi25030630001-010.png)
+
+\>plot2d("cos(x)","sin(3\*x)",xmin=0,xmax=2pi):
+
+
+![images/TugasAplikom4Adi25030630001-011.png](images/TugasAplikom4Adi25030630001-011.png)
+
+Alternatif selain tanda titik dua adalah perintah insimg(lines), yang
+menyisipkan grafik dengan memakan jumlah baris teks tertentu.
+
+
+Pada bagian opsi, grafik dapat diatur agar tampil:
+
+
+* 
+di jendela terpisah yang ukurannya bisa diubah,
+
+* 
+di dalam jendela notebook.
+
+
+Gaya lain yang lebih bervariasi bisa didapatkan dengan menggunakan
+perintah grafik khusus.
+
+
+Dalam kasus apa pun, tekan tombol tabulator untuk melihat grafik jika
+gambarnya tersembunyi.
+
+
+Untuk membagi jendela menjadi beberapa grafik, gunakan perintah
+figure(). Pada contoh ini, kita membuat grafik dari x^1 sampai x^4 ke
+dalam 4 bagian jendela. figure(0) mengembalikan tampilan ke jendela
+bawaan.
+
+
+\>reset;
+
+\>figure(2,2); ...  
+\>   for n=1 to 4; figure(n); plot2d("x^"+n); end; ...  
+\>   figure(0):
+
+
+![images/TugasAplikom4Adi25030630001-012.png](images/TugasAplikom4Adi25030630001-012.png)
+
+Pada plot2d(), terdapat pilihan gaya alternatif yang bisa digunakan
+dengan grid=x. Untuk gambaran umumnya, kami menampilkan berbagai gaya
+kisi (grid) dalam satu gambar (lihat di bawah untuk penggunaan
+perintah figure()). Gaya grid=0 tidak disertakan, yang mana gaya ini
+tidak menampilkan kisi maupun bingkai.
+
+
+\>figure(3,3); ...  
+\>   for k=1:9; figure(k); plot2d("x^3-x",-2,1,grid=k); end; ...  
+\>   figure(0):
+
+
+![images/TugasAplikom4Adi25030630001-013.png](images/TugasAplikom4Adi25030630001-013.png)
+
+Jika argumen untuk plot2d() berupa ekspresi yang diikuti oleh empat
+angka, angka-angka tersebut merupakan rentang sumbu-x dan sumbu-y
+untuk grafik tersebut.
+
+
+Sebagai alternatif, parameter a, b, c, d dapat ditentukan menggunakan
+nama parameter seperti a=... dan seterusnya.
+
+
+Pada contoh berikut, kita mengubah gaya kisi (grid), menambahkan
+label, serta menggunakan label vertikal untuk sumbu-y.
+
+
+\>aspect(1.5); plot2d("sin(x)",0,2pi,-1.2,1.2,grid=3,xl="x",yl="sin(x)"):
+
+
+![images/TugasAplikom4Adi25030630001-014.png](images/TugasAplikom4Adi25030630001-014.png)
+
+\>plot2d("sin(x)+cos(2\*x)",0,4pi):
+
+
+![images/TugasAplikom4Adi25030630001-015.png](images/TugasAplikom4Adi25030630001-015.png)
+
+Gambar yang dihasilkan dengan menyisipkan grafik ke dalam jendela teks
+disimpan di direktori yang sama dengan notebook, secara bawaan berada
+di dalam subdirektori bernama "images". Gambar-gambar ini juga
+digunakan untuk ekspor ke format HTML.
+
+
+Kamu bisa menyalin gambar apa saja ke clipboard secara langsung dengan
+menekan tombol Ctrl-C pada gambar yang dipilih. Tentu saja, kamu juga
+bisa mengekspor grafik saat ini menggunakan fungsi-fungsi yang ada di
+menu File.
+
+
+Fungsi atau ekspresi pada plot2d dievaluasi secara adaptif. Untuk
+kecepatan lebih tinggi, matikan grafik adaptif dengan &lt;adaptive dan
+tentukan jumlah sub-interval menggunakan n=.... Hal ini biasanya hanya
+diperlukan dalam kasus-kasus tertentu yang cukup jarang.
+
+
+\>plot2d("sign(x)\*exp(-x^2)",-1,1,<adaptive,n=10000):
+
+
+![images/TugasAplikom4Adi25030630001-016.png](images/TugasAplikom4Adi25030630001-016.png)
+
+\>plot2d("x^x",r=1.2,cx=1,cy=1):
+
+
+![images/TugasAplikom4Adi25030630001-017.png](images/TugasAplikom4Adi25030630001-017.png)
+
+Perhatikan bahwa $x^x$ tidak terdefinisi untuk $x \le 0$. Fungsi
+plot2d menangani kesalahan (error) ini dan mulai menggambar grafik
+segera setelah fungsinya terdefinisi. Ini berlaku untuk semua fungsi
+yang mengembalikan nilai NAN di luar rentang definisinya.
+
+
+\>plot2d("log(x)",-0.1,2):
+
+
+![images/TugasAplikom4Adi25030630001-018.png](images/TugasAplikom4Adi25030630001-018.png)
+
+Parameter square=true (atau &gt;square) memilih rentang sumbu-y secara
+otomatis sehingga hasilnya berupa jendela grafik yang persegi.
+Perhatikan bahwa secara bawaan (default), Euler menggunakan ruang
+berbentuk persegi di dalam jendela grafik.
+
+
+\>plot2d("x^3-x",\>square):
+
+
+![images/TugasAplikom4Adi25030630001-019.png](images/TugasAplikom4Adi25030630001-019.png)
+
+\>plot2d(''integrate("sin(x)\*exp(-x^2)",0,x)'',0,2): // plot integral
+
+
+![images/TugasAplikom4Adi25030630001-020.png](images/TugasAplikom4Adi25030630001-020.png)
+
+Jika kamu membutuhkan lebih banyak ruang untuk label sumbu-y, panggil
+fungsi shrinkwindow() dengan parameter smaller, atau atur nilai
+positif untuk opsi smaller pada plot2d().
+
+
+\>plot2d("gamma(x)",1,10,yl="y-values",smaller=6,<vertical):
+
+
+![images/TugasAplikom4Adi25030630001-021.png](images/TugasAplikom4Adi25030630001-021.png)
+
+Ekspresi simbolik juga bisa digunakan, karena ekspresi tersebut
+disimpan sebagai ekspresi string sederhana.
+
+
+\>x=linspace(0,2pi,1000); plot2d(sin(5x),cos(7x)):
+
+
+![images/TugasAplikom4Adi25030630001-022.png](images/TugasAplikom4Adi25030630001-022.png)
+
+\>a:=5.6; expr &= exp(-a\*x^2)/a; // define expression
+
+\>plot2d(expr,-2,2): // plot from -2 to 2
+
+
+![images/TugasAplikom4Adi25030630001-023.png](images/TugasAplikom4Adi25030630001-023.png)
+
+\>plot2d(expr,r=1,thickness=2): // plot in a square around (0,0)
+
+
+![images/TugasAplikom4Adi25030630001-024.png](images/TugasAplikom4Adi25030630001-024.png)
+
+\>plot2d(&diff(expr,x),\>add,style="--",color=red): // add another plot
+
+
+![images/TugasAplikom4Adi25030630001-025.png](images/TugasAplikom4Adi25030630001-025.png)
+
+\>plot2d(&diff(expr,x,2),a=-2,b=2,c=-2,d=1): // plot in rectangle
+
+
+![images/TugasAplikom4Adi25030630001-026.png](images/TugasAplikom4Adi25030630001-026.png)
+
+\>plot2d(&diff(expr,x),a=-2,b=2,\>square): // keep plot square
+
+
+![images/TugasAplikom4Adi25030630001-027.png](images/TugasAplikom4Adi25030630001-027.png)
+
+\>plot2d("x^2",0,1,steps=1,color=red,n=10):
+
+
+![images/TugasAplikom4Adi25030630001-028.png](images/TugasAplikom4Adi25030630001-028.png)
+
+\>plot2d("x^2",\>add,steps=2,color=blue,n=10):
+
+
+![images/TugasAplikom4Adi25030630001-029.png](images/TugasAplikom4Adi25030630001-029.png)
+
+# Functions in one Parameter
+
+Fungsi pemetaan (plotting) yang paling penting untuk grafik dua
+dimensi (planar plots) adalah plot2d(). Fungsi ini diimplementasikan
+dalam bahasa Euler di dalam berkas "plot.e", yang dimuat saat program
+dijalankan.
+
+
+Berikut adalah beberapa contoh penggunaan fungsi. Seperti biasa di
+EMT, untuk fungsi yang bekerja pada fungsi atau ekspresi lain, kamu
+bisa meneruskan parameter tambahan (selain x) yang bukan merupakan
+variabel global ke fungsi tersebut menggunakan parameter titik koma
+(semicolon parameters) atau dengan koleksi panggilan (call
+collection).
+
+
+\>function f(x,a) := x^2/a+a\*x^2-x; // define a function
+
+\>a=0.3; plot2d("f",0,1;a): // plot with a=0.3
+
+
+![images/TugasAplikom4Adi25030630001-030.png](images/TugasAplikom4Adi25030630001-030.png)
+
+\>plot2d("f",0,1;0.4): // plot with a=0.4
+
+
+![images/TugasAplikom4Adi25030630001-031.png](images/TugasAplikom4Adi25030630001-031.png)
+
+\>plot2d({{"f",0.2}},0,1): // plot with a=0.2
+
+
+![images/TugasAplikom4Adi25030630001-032.png](images/TugasAplikom4Adi25030630001-032.png)
+
+\>plot2d({{"f(x,b)",b=0.1}},0,1): // plot with 0.1
+
+
+![images/TugasAplikom4Adi25030630001-033.png](images/TugasAplikom4Adi25030630001-033.png)
+
+\>function f(x) := x^3-x; ...  
+\>   plot2d("f",r=1):
+
+
+![images/TugasAplikom4Adi25030630001-034.png](images/TugasAplikom4Adi25030630001-034.png)
+
+Berikut adalah rangkuman fungsi yang diterima:
+
+
+* 
+ekspresi atau ekspresi simbolik dalam variabel x,
+
+* 
+fungsi atau fungsi simbolik berdasarkan nama sebagai "f",
+
+* 
+fungsi simbolik hanya dengan namanya f.
+
+
+Fungsi plot2d() juga menerima fungsi simbolik. Untuk fungsi simbolik,
+penulisan namanya saja sudah cukup untuk menjalankan fungsi tersebut.
+
+
+\>function f(x) &= diff(x^x,x)
+
+
+    
+                                x
+                               x  (log(x) + 1)
+    
+
+\>plot2d(f,0,2):
+
+
+![images/TugasAplikom4Adi25030630001-035.png](images/TugasAplikom4Adi25030630001-035.png)
+
+Tentu saja, untuk ekspresi atau ekspresi simbolik, penulisan nama
+variabelnya saja sudah cukup untuk menggambar grafiknya.
+
+
+\>expr &= sin(x)\*exp(-x)
+
+
+    
+                                  - x
+                                 E    sin(x)
+    
+
+\>plot2d(expr,0,3pi):
+
+
+![images/TugasAplikom4Adi25030630001-036.png](images/TugasAplikom4Adi25030630001-036.png)
+
+\>function f(x) &= x^x;
+
+\>plot2d(f,r=1,cx=1,cy=1,color=blue,thickness=2);
+
+\>plot2d(&diff(f(x),x),\>add,color=red,style="-.-"):
+
+
+![images/TugasAplikom4Adi25030630001-037.png](images/TugasAplikom4Adi25030630001-037.png)
+
+Untuk gaya garis (line style), terdapat beberapa pilihan yang
+tersedia.
+
+
+* 
+style="...": Pilih dari "-", "--", "-.", ".", ".-.", "-.-".
+
+* 
+
+* color: Lihat penjelasan warna di bawah ini.
+
+
+* 
+thickness: Nilai bawaan (default) adalah 1.
+
+
+Warna dapat dipilih dari salah satu warna standar atau menggunakan
+warna RGB.
+
+
+* 
+0..15: indeks warna bawaan.
+
+* 
+
+* konstanta warna: white, black, red, green, blue, cyan, olive,
+* lightgray, gray, darkgray, orange, lightgreen, turquoise, lightblue,
+* lightorange, yellow
+
+
+* 
+rgb(red,green,blue): parameter berupa angka riil dalam rentang
+* [0,1].
+
+
+\>plot2d("exp(-x^2)",r=2,color=red,thickness=3,style="--"):
+
+
+![images/TugasAplikom4Adi25030630001-038.png](images/TugasAplikom4Adi25030630001-038.png)
+
+Berikut adalah tampilan warna-warna bawaan (*predefined colors*) dari
+EMT.
+
+
+\>aspect(2); columnsplot(ones(1,16),lab=0:15,grid=0,color=0:15):
+
+
+![images/TugasAplikom4Adi25030630001-039.png](images/TugasAplikom4Adi25030630001-039.png)
+
+Tapi kamu juga bisa memakai warna apa saja yang kamu mau.
+
+
+\>columnsplot(ones(1,16),grid=0,color=rgb(0,0,linspace(0,1,15))):
+
+
+![images/TugasAplikom4Adi25030630001-040.png](images/TugasAplikom4Adi25030630001-040.png)
+
+# Menggambar Beberapa Kurva pada bidang koordinat yang sama
+
+Untuk menggambar lebih dari satu fungsi (banyak fungsi) ke dalam satu
+jendela, terdapat beberapa cara yang bisa digunakan. Salah satu
+metodenya adalah menggunakan opsi `&gt;add` pada pemanggilan `plot2d`
+berikutnya setelah pemanggilan pertama. Fitur ini sebenarnya sudah
+kita gunakan pada contoh-contoh di atas.
+
+
+\>aspect(); plot2d("cos(x)",r=2,grid=6); plot2d("x",style=".",\>add):
+
+
+![images/TugasAplikom4Adi25030630001-041.png](images/TugasAplikom4Adi25030630001-041.png)
+
+\>aspect(1.5); plot2d("sin(x)",0,2pi); plot2d("cos(x)",color=blue,style="--",\>add):
+
+
+![images/TugasAplikom4Adi25030630001-042.png](images/TugasAplikom4Adi25030630001-042.png)
+
+Salah satu kegunaan &gt;add adalah untuk menambahkan titik pada kurva.
+
+
+\>plot2d("sin(x)",0,pi); plot2d(2,sin(2),\>points,\>add):
+
+
+![images/TugasAplikom4Adi25030630001-043.png](images/TugasAplikom4Adi25030630001-043.png)
+
+Kita menambahkan titik potong beserta labelnya (pada posisi "cl" untuk
+*center left*), lalu menyisipkan hasilnya ke dalam notebook. Kita juga
+menambahkan judul pada grafik tersebut.
+
+
+\>plot2d(["cos(x)","x"],r=1.1,cx=0.5,cy=0.5, ...  
+\>     color=[black,blue],style=["-","."], ...  
+\>     grid=1);
+
+
+    Illegal parameter after named parameter!
+    Error in:
+    ... ,   color=[black,blue],style=["-","."],   grid=1); ...
+                                                         ^
+
+\>x0=solve("cos(x)-x",1);  ...  
+\>     plot2d(x0,x0,\>points,\>add,title="Intersection Demo");  ...  
+\>     label("cos(x) = x",x0,x0,pos="cl",offset=20):
+
+
+![images/TugasAplikom4Adi25030630001-044.png](images/TugasAplikom4Adi25030630001-044.png)
+
+Pada demo berikut, kita akan menggambarkan grafik fungsi
+sinc(x)=sin(x)/x beserta ekspansi Taylor ke-8 dan ke-16 miliknya. Kita
+menghitung ekspansi ini menggunakan Maxima melalui ekspresi simbolik.
+
+
+Grafik ini dibuat dalam perintah multi-baris berikut dengan tiga kali
+pemanggilan plot2d(). Pemanggilan kedua dan ketiga memiliki bendera
+(flag) &gt;add yang diaktifkan, sehingga grafik tersebut menggunakan
+rentang sumbu yang sama seperti sebelumnya.
+
+
+Kita juga menambahkan kotak label yang menjelaskan fungsi-fungsi
+tersebut.
+
+
+\>$taylor(sin(x)/x,x,0,4)
+
+
+$$\frac{x^4}{120}-\frac{x^2}{6}+1$$\>plot2d("sinc(x)",0,4pi,color=green,thickness=2); ...  
+\>     plot2d(&taylor(sin(x)/x,x,0,8),\>add,color=blue,style="--"); ...  
+\>     plot2d(&taylor(sin(x)/x,x,0,16),\>add,color=red,style="-.-"); ...  
+\>     labelbox(["sinc","T8","T16"],styles=["-","--","-.-"], ...  
+\>       colors=[black,blue,red]):
+
+
+![images/TugasAplikom4Adi25030630001-046.png](images/TugasAplikom4Adi25030630001-046.png)
+
+Pada contoh berikut, kita menghasilkan polinomial Bernstein (Bernstein
+Polynomials).
+
+
+$$B_i(x) = \binom{n}{i} x^i (1-x)^{n-i}$$\>plot2d("(1-x)^10",0,1); // plot first function
+
+\>for i=1 to 10; plot2d("bin(10,i)\*x^i\*(1-x)^(10-i)",\>add); end;
+
+\>insimg;
+
+
+![images/TugasAplikom4Adi25030630001-048.png](images/TugasAplikom4Adi25030630001-048.png)
+
+Metode kedua adalah menggunakan sepasang matriks untuk nilai-x dan
+matriks untuk nilai-y yang berukuran sama.
+
+
+Kita menghasilkan matriks nilai dengan satu Polinomial Bernstein di
+setiap barisnya. Untuk ini, kita cukup menggunakan vektor kolom dari
+$i$. Silakan lihat bagian pengantar tentang bahasa matriks untuk
+mempelajari detail selengkapnya.
+
+
+\>x=linspace(0,1,500);
+
+\>n=10; k=(0:n)'; // n is row vector, k is column vector
+
+\>y=bin(n,k)\*x^k\*(1-x)^(n-k); // y is a matrix then
+
+\>plot2d(x,y):
+
+
+![images/TugasAplikom4Adi25030630001-049.png](images/TugasAplikom4Adi25030630001-049.png)
+
+Perhatikan bahwa parameter warna (*color*) dapat berupa sebuah vektor.
+Jika menggunakan vektor, maka setiap warna akan diterapkan pada
+masing-masing baris dari matriks tersebut.
+
+
+\>x=linspace(0,1,200); y=x^(1:10)'; plot2d(x,y,color=1:10):
+
+
+![images/TugasAplikom4Adi25030630001-050.png](images/TugasAplikom4Adi25030630001-050.png)
+
+Metode lainnya adalah menggunakan vektor dari ekspresi (string). Kamu
+kemudian dapat menggunakan matriks/vektor warna, matriks gaya garis
+(*styles*), dan matriks ketebalan (*thicknesses*) dengan panjang yang
+sama.
+
+
+\>plot2d(["sin(x)","cos(x)"],0,2pi,color=4:5): 
+
+
+![images/TugasAplikom4Adi25030630001-051.png](images/TugasAplikom4Adi25030630001-051.png)
+
+\>plot2d(["sin(x)","cos(x)"],0,2pi): // plot vector of expressions
+
+
+![images/TugasAplikom4Adi25030630001-052.png](images/TugasAplikom4Adi25030630001-052.png)
+
+Kita dapat memperoleh vektor tersebut dari Maxima menggunakan
+`makelist()` dan `mxm2str()`.
+
+
+\>v &= makelist(binomial(10,i)\*x^i\*(1-x)^(10-i),i,0,10) // make list
+
+
+    
+                   10            9              8  2             7  3
+           [(1 - x)  , 10 (1 - x)  x, 45 (1 - x)  x , 120 (1 - x)  x , 
+               6  4             5  5             4  6             3  7
+    210 (1 - x)  x , 252 (1 - x)  x , 210 (1 - x)  x , 120 (1 - x)  x , 
+              2  8              9   10
+    45 (1 - x)  x , 10 (1 - x) x , x  ]
+    
+
+\>mxm2str(v) // get a vector of strings from the symbolic vector
+
+
+    (1-x)^10
+    10*(1-x)^9*x
+    45*(1-x)^8*x^2
+    120*(1-x)^7*x^3
+    210*(1-x)^6*x^4
+    252*(1-x)^5*x^5
+    210*(1-x)^4*x^6
+    120*(1-x)^3*x^7
+    45*(1-x)^2*x^8
+    10*(1-x)*x^9
+    x^10
+
+\>plot2d(mxm2str(v),0,1): // plot functions
+
+
+![images/TugasAplikom4Adi25030630001-053.png](images/TugasAplikom4Adi25030630001-053.png)
+
+Alternatif lainnya adalah menggunakan bahasa matriks dari Euler.
+
+
+Jika suatu ekspresi menghasilkan matriks fungsi, dengan satu fungsi di
+setiap barisnya, maka semua fungsi ini akan digambarkan ke dalam satu
+grafik.
+
+
+Untuk melakukan hal ini, gunakan vektor parameter dalam bentuk vektor
+kolom. Jika matriks/vektor warna ditambahkan, warna tersebut akan
+diterapkan pada masing-masing baris grafik.
+
+
+\>n=(1:10)'; plot2d("x^n",0,1,color=1:10):
+
+
+![images/TugasAplikom4Adi25030630001-054.png](images/TugasAplikom4Adi25030630001-054.png)
+
+Ekspresi dan fungsi satu baris (one-line functions) dapat membaca
+variabel global.
+
+
+Jika kamu tidak dapat menggunakan variabel global, kamu perlu
+menggunakan fungsi dengan parameter tambahan, lalu meneruskan
+parameter ini sebagai parameter titik koma (semicolon parameter).
+
+
+Berhati-hatilah untuk meletakkan semua parameter yang ditugaskan
+(assigned parameters) di bagian akhir perintah plot2d. Pada contoh
+ini, kita meneruskan a=5 ke fungsi f, yang kita gambarkan dari -10
+hingga 10.
+
+
+\>function f(x,a) := 1/a\*exp(-x^2/a); ...  
+\>   plot2d("f",-10,10;5,thickness=2,title="a=5"):
+
+
+![images/TugasAplikom4Adi25030630001-055.png](images/TugasAplikom4Adi25030630001-055.png)
+
+Alternatif lainnya adalah menggunakan *collection* yang berisi nama
+fungsi beserta semua parameter tambahannya. Daftar khusus ini disebut
+*call collections*, dan ini merupakan cara yang disarankan untuk
+meneruskan argumen ke suatu fungsi yang dirinya sendiri diteruskan
+sebagai argumen ke fungsi lain.
+
+
+Pada contoh berikut, kita menggunakan perulangan (*loop*) untuk
+menggambar beberapa fungsi sekaligus (silakan lihat tutorial tentang
+pemograman untuk penjelasan mengenai perulangan `for`).
+
+
+\>plot2d({{"f",1}},-10,10); ...  
+\>   for a=2:10; plot2d({{"f",a}},\>add); end:
+
+
+![images/TugasAplikom4Adi25030630001-056.png](images/TugasAplikom4Adi25030630001-056.png)
+
+Kita bisa mencapai hasil yang sama dengan cara berikut menggunakan
+bahasa matriks dari EMT. Setiap baris dari matriks `f(x,a)` mewakili
+satu fungsi. Selain itu, kita dapat mengatur warna untuk setiap baris
+matriks tersebut. Klik dua kali pada fungsi `getspectral()` untuk
+melihat penjelasannya.
+
+
+Hasil double click :
+
+
+figure
+
+
+---
+
+getspectral
+
+
+function getspectral (x)
+
+
+Function in file : C:\Program Files\Euler x64\util\statistics
+
+
+Get a spectral color for 0&lt;=x&lt;=1.
+
+
+The scheme runs from blue (0) to red (1)
+
+
+\>x=-10:0.01:10; a=(1:10)'; plot2d(x,f(x,a),color=getspectral(a/10)):
+
+
+![images/TugasAplikom4Adi25030630001-057.png](images/TugasAplikom4Adi25030630001-057.png)
+
+## Text Labels
+
+Dekorasi sederhana yang dapat digunakan antara lain:
+
+
+* 
+judul dengan title="..."
+
+* 
+label sumbu-x dan sumbu-y dengan xl="...", yl="..."
+
+* 
+label teks tambahan dengan label("...",x,y)
+
+
+Perintah label akan menggambarkan teks ke dalam grafik yang sedang
+aktif pada koordinat grafik $(x,y)$. Perintah ini juga dapat menerima
+argumen posisi (positional argument).
+
+
+\>plot2d("x^3-x",-1,2,title="y=x^3-x",yl="y",xl="x"):
+
+
+![images/TugasAplikom4Adi25030630001-058.png](images/TugasAplikom4Adi25030630001-058.png)
+
+\>expr := "log(x)/x"; ...  
+\>     plot2d(expr,0.5,5,title="y="+expr,xl="x",yl="y"); ...  
+\>     label("(1,0)",1,0); label("Max",E,expr(E),pos="lc"):
+
+
+![images/TugasAplikom4Adi25030630001-059.png](images/TugasAplikom4Adi25030630001-059.png)
+
+Ada juga fungsi `labelbox()`, yang dapat menampilkan daftar fungsi
+beserta teks penjelasannya. Fungsi ini menerima vektor dari string dan
+warna, dengan satu elemen untuk setiap fungsi.
+
+
+\>function f(x) &= x^2\*exp(-x^2);  ...  
+\>   plot2d(&f(x),a=-3,b=3,c=-1,d=1);  ...  
+\>   plot2d(&diff(f(x),x),\>add,color=blue,style="--"); ...  
+\>   labelbox(["function","derivative"],styles=["-","--"], ...  
+\>      colors=[black,blue],w=0.4):
+
+
+![images/TugasAplikom4Adi25030630001-060.png](images/TugasAplikom4Adi25030630001-060.png)
+
+Secara *default*, kotak label ditautkan (*anchored*) di sudut kanan
+atas, tetapi opsi `&gt;left` akan menautkannya di sudut kiri atas. Kamu
+juga dapat memindahkannya ke posisi mana saja sesuai keinginan. Posisi
+tautan tersebut adalah sudut kanan atas dari kotak label, dan nilainya
+berupa pecahan (fraksi) dari ukuran jendela grafik. Lebar kotaknya
+akan menyesuaikan secara otomatis.
+
+
+Untuk grafik berupa titik-titik (*point plots*), kotak label ini juga
+dapat digunakan. Cukup tambahkan parameter `&gt;points`, atau gunakan
+vektor bendera (*vector of flags*) dengan satu bendera untuk
+masing-masing label.
+
+
+Pada contoh berikut, hanya ada satu fungsi yang digambarkan. Jadi,
+kita dapat menggunakan string biasa alih-alih vektor string. Kita juga
+mengatur warna teks menjadi hitam untuk contoh ini.
+
+
+\>n=10; plot2d(0:n,bin(n,0:n),\>addpoints); ...  
+\>   labelbox("Binomials",styles="[]",\>points,x=0.1,y=0.1, ...  
+\>   tcolor=black,\>left):
+
+
+![images/TugasAplikom4Adi25030630001-061.png](images/TugasAplikom4Adi25030630001-061.png)
+
+Gaya grafik seperti ini juga tersedia pada fungsi `statplot()`. Sama
+seperti pada `plot2d()`, warna dapat diatur untuk setiap baris grafik.
+Terdapat pula grafik khusus lainnya yang ditujukan untuk keperluan
+statistik (silakan lihat tutorial tentang statistik).
+
+
+\>statplot(1:10,random(2,10),color=[red,blue]):
+
+
+![images/TugasAplikom4Adi25030630001-062.png](images/TugasAplikom4Adi25030630001-062.png)
+
+Fitur yang serupa dengan ini adalah fungsi `textbox()`.
+
+
+Secara *default*, lebar kotaknya mengikuti lebar maksimum dari
+baris-baris teks di dalamnya. Namun, lebarnya juga dapat diatur secara
+manual oleh pengguna.
+
+
+\>function f(x) &= exp(-x)\*sin(2\*pi\*x); ...  
+\>   plot2d("f(x)",0,2pi); ...  
+\>   textbox(latex("\\text{Example of a damped oscillation}\\ f(x)=e^{-x}sin(2\\pi x)"),w=0.85):
+
+
+![images/TugasAplikom4Adi25030630001-063.png](images/TugasAplikom4Adi25030630001-063.png)
+
+Label teks, judul, kotak label, dan teks lainnya dapat memuat string
+Unicode (silakan lihat panduan sintaks EMT untuk informasi lebih
+lanjut mengenai string Unicode).
+
+
+\>plot2d("x^3-x",title=u"x &rarr; x&sup3; - x"):
+
+
+![images/TugasAplikom4Adi25030630001-064.png](images/TugasAplikom4Adi25030630001-064.png)
+
+Label pada sumbu-x dan sumbu-y dapat diposisikan secara vertikal,
+demikian pula dengan sumbu itu sendiri.
+
+
+\>plot2d("sinc(x)",0,2pi,xl="x",yl=u"x &rarr; sinc(x)",\>vertical):
+
+
+![images/TugasAplikom4Adi25030630001-065.png](images/TugasAplikom4Adi25030630001-065.png)
+
+## LaTeX
+
+Kamu juga dapat menggambarkan formula LaTeX jika kamu sudah menginstal
+sistem LaTeX. Saya menyarankan untuk menggunakan MiKTeX. Jalur
+(*path*) menuju berkas biner "latex" dan "dvipng" harus sudah
+ditambahkan ke *system path*, atau kamu harus mengaturnya terlebih
+dahulu di menu opsi.
+
+
+Perlu diingat bahwa pemrosesan (*parsing*) LaTeX membutuhkan waktu
+yang agak lambat. Jika kamu ingin menggunakan LaTeX dalam grafik
+animasi, sebaiknya panggil fungsi `latex()` sekali saja sebelum
+perulangan (*loop*) dan gunakan hasilnya (berupa gambar dalam matriks
+RGB).
+
+
+Pada grafik berikut, kita menggunakan LaTeX untuk label sumbu-x dan
+sumbu-y, label teks, kotak label (*label box*), serta judul grafik.
+
+
+\>plot2d("exp(-x)\*sin(x)/x",a=0,b=2pi,c=0,d=1,grid=6,color=blue, ...  
+\>     title=latex("\\text{Function $\\Phi$}"), ...  
+\>     xl=latex("\\phi"),yl=latex("\\Phi(\\phi)")); ...  
+\>   textbox( ...  
+\>     latex("\\Phi(\\phi) = e^{-\\phi} \\frac{\\sin(\\phi)}{\\phi}"),x=0.8,y=0.5); ...  
+\>   label(latex("\\Phi",color=blue),1,0.4):
+
+
+![images/TugasAplikom4Adi25030630001-066.png](images/TugasAplikom4Adi25030630001-066.png)
+
+Sering kali, kita menginginkan jarak (*spacing*) yang tidak sebanding
+(*non-conformal*) dan label teks pada sumbu-x. Kita dapat menggunakan
+`xaxis()` dan `yaxis()` seperti yang akan ditunjukkan nanti.
+
+
+Cara termudah adalah dengan membuat grafik kosong beserta bingkainya
+menggunakan `grid=4`, lalu menambahkan garis kisi (*grids*) dengan
+`ygrid()` dan `xgrid()`. Pada contoh berikut, kita menggunakan tiga
+string LaTeX untuk label pada sumbu-x dengan `xtick()`.
+
+
+\>plot2d("sinc(x)",0,2pi,grid=4,<ticks); ...  
+\>   ygrid(-2:0.5:2,grid=6); ...  
+\>   xgrid([0:2]\*pi,<ticks,grid=6);  ...  
+\>   xtick([0,pi,2pi],["0","\\pi","2\\pi"],\>latex):
+
+
+![images/TugasAplikom4Adi25030630001-067.png](images/TugasAplikom4Adi25030630001-067.png)
+
+Tentu saja, fungsi biasa juga dapat digunakan.
+
+
+\>function map f(x) ...
+
+
+    if x>0 then return x^4
+    else return x^2
+    endif
+    endfunction
+</pre>
+Parameter `map` membantu agar fungsi dapat digunakan untuk vektor.
+Untuk pembuatan grafik, hal ini sebenarnya tidak terlalu diperlukan.
+Namun, untuk menunjukkan bahwa vektorisasi (*vectorization*) itu
+berguna, kita menambahkan beberapa titik kunci ke grafik pada x = -1,
+x = 0, dan x = 1.
+
+
+Pada grafik berikut, kita juga memasukkan beberapa kode LaTeX. Kode
+ini kita gunakan untuk dua buah label dan sebuah kotak teks (*text
+box*). Tentu saja, kamu hanya bisa menggunakan LaTeX jika sistem LaTeX
+sudah terinstal dengan benar di komputer kamu.
+
+
+\>plot2d("f",-1,1,xl="x",yl="f(x)",grid=6);  ...  
+\>   plot2d([-1,0,1],f([-1,0,1]),\>points,\>add); ...  
+\>   label(latex("x^3"),0.72,f(0.72)); ...  
+\>   label(latex("x^2"),-0.52,f(-0.52),pos="ll"); ...  
+\>   textbox( ...  
+\>     latex("f(x)=\\begin{cases} x^3 & x\>0 \\\\ x^2 & x \\le 0\\end{cases}"), ...  
+\>     x=0.7,y=0.2):
+
+
+![images/TugasAplikom4Adi25030630001-068.png](images/TugasAplikom4Adi25030630001-068.png)
+
+## User Interaction
+
+Saat menggambarkan fungsi atau ekspresi, parameter &gt;user memungkinkan
+pengguna untuk melakukan zoom dan menggeser (shift) tampilan grafik
+menggunakan tombol panah (cursor keys) atau tetikus (mouse). Pengguna
+dapat:
+
+
+* 
+melakukan zoom dengan tombol + atau -
+
+* 
+menggeser grafik menggunakan tombol panah (cursor keys)
+
+* 
+memilih area grafik menggunakan mouse
+
+* 
+mengembalikan tampilan ke posisi awal dengan tombol spasi (space)
+
+* 
+keluar dari mode interaktif dengan tombol Enter (return)
+
+
+Tombol spasi akan mengembalikan skala grafik ke jendela grafik (plot
+window) semula.
+
+
+Sedangkan saat menggambarkan data, bendera &gt;user hanya akan menunggu
+hingga ada penekanan tombol (key stroke) dari pengguna.
+
+
+\>plot2d({{"x^3-a\*x",a=1}},\>user,title="Press any key!"):
+
+
+![images/TugasAplikom4Adi25030630001-069.png](images/TugasAplikom4Adi25030630001-069.png)
+
+\>plot2d("exp(x)\*sin(x)",user=true, ...  
+\>     title="+/- or cursor keys (return to exit)"):
+
+
+![images/TugasAplikom4Adi25030630001-070.png](images/TugasAplikom4Adi25030630001-070.png)
+
+Berikut ini menunjukkan cara interaksi pengguna tingkat lanjut
+(silakan lihat tutorial tentang pemograman untuk detail lebih lanjut).
+
+
+Fungsi bawaan `mousedrag()` bertugas menunggu peristiwa (*events*)
+dari tetikus (*mouse*) atau papan ketik (*keyboard*). Fungsi ini akan
+melaporkan saat tombol tetikus ditekan (*mouse down*), digeser (*mouse
+moved*), dilepas (*mouse up*), serta saat ada tombol papan ketik yang
+ditekan. Fungsi `dragpoints()` memanfaatkan fitur ini untuk
+memungkinkan pengguna menggeser (*drag*) titik mana pun pada grafik.
+
+
+Pertama-tama, kita memerlukan sebuah fungsi grafik terlebih dahulu.
+Sebagai contoh, kita melakukan interpolasi menggunakan polinomial pada
+5 titik. Fungsi ini harus menggambar ke dalam area grafik yang tetap
+(*fixed plot area*).
+
+
+\>function plotf(xp,yp,select) ...
+
+
+      d=interp(xp,yp);
+      plot2d("interpval(xp,d,x)";d,xp,r=2);
+      plot2d(xp,yp,>points,>add);
+      if select>0 then
+        plot2d(xp[select],yp[select],color=red,>points,>add);
+      endif;
+      title("Drag one point, or press space or return!");
+    endfunction
+</pre>
+Perhatikan penggunaan parameter titik koma (`;`) pada `plot2d` (`d`
+dan `xp`), yang diteruskan ke evaluasi fungsi `interp()`. Tanpa ini,
+kita harus menulis fungsi `plotinterp()` terlebih dahulu yang
+mengakses nilai-nilai tersebut secara global.
+
+
+Sekarang kita akan menghasilkan beberapa nilai acak dan membiarkan
+pengguna menggeser titik-titik tersebut.
+
+
+\>t=-1:0.5:1; dragpoints("plotf",t,random(size(t))-0.5):
+
+
+![images/TugasAplikom4Adi25030630001-071.png](images/TugasAplikom4Adi25030630001-071.png)
+
+Ada juga fungsi yang dapat menggambarkan fungsi lain berdasarkan
+vektor parameter, serta memungkinkan pengguna untuk menyesuaikan
+parameter-parameter tersebut secara interaktif.
+
+
+Pertama-tama, kita memerlukan fungsi grafik (*plot function*) terlebih
+dahulu.
+
+
+\>function plotf([a,b]) := plot2d("exp(a\*x)\*cos(2pi\*b\*x)",0,2pi;a,b);
+
+
+Selanjutnya, kita membutuhkan nama untuk setiap parameter, nilai awal
+(*initial values*), dan matriks berukuran $n \times 2$ yang berisi
+rentang nilai (*ranges*), serta secara opsional sebuah baris judul
+(*heading line*).
+
+
+Terdapat penggeser (*sliders*) interaktif yang dapat digunakan oleh
+pengguna untuk mengatur nilai. Fungsi `dragvalues()` menyediakan fitur
+ini.
+
+
+\>dragvalues("plotf",["a","b"],[-1,2],[[-2,2];[1,10]], ...  
+\>     heading="Drag these values:",hcolor=black):
+
+
+![images/TugasAplikom4Adi25030630001-072.png](images/TugasAplikom4Adi25030630001-072.png)
+
+Dimungkinkan untuk membatasi nilai yang digeser agar hanya berupa
+bilangan bulat (*integers*). Sebagai contoh, kita menuliskan sebuah
+fungsi grafik yang menggambarkan polinomial Taylor berderajat $n$ dari
+fungsi kosinus.
+
+
+\>function plotf(n) ...
+
+
+    plot2d("cos(x)",0,2pi,>square,grid=6);
+    plot2d(&"taylor(cos(x),x,0,@n)",color=blue,>add);
+    textbox("Taylor polynomial of degree "+n,0.1,0.02,style="t",>left);
+    endfunction
+</pre>
+Sekarang kita mengizinkan derajat $n$ untuk bervariasi dari 0 hingga
+20 dalam 20 tahapan. Hasil dari `dragvalues()` digunakan untuk
+menggambar sketsa dengan nilai $n$ tersebut, serta menyisipkan hasil
+grafiknya ke dalam *notebook*.
+
+
+\>nd=dragvalues("plotf","degree",2,[0,20],20,y=0.8, ...  
+\>      heading="Drag the value:"); ...  
+\>   plotf(nd):
+
+
+![images/TugasAplikom4Adi25030630001-073.png](images/TugasAplikom4Adi25030630001-073.png)
+
+Berikut adalah demonstrasi sederhana dari penggunaan fungsi tersebut.
+Pengguna dapat menggambar di atas jendela grafik (*plot window*), yang
+akan meninggalkan jejak berupa titik-titik.
+
+
+\>function dragtest ...
+
+
+      plot2d(none,r=1,title="Drag with the mouse, or press any key!");
+      start=0;
+      repeat
+        {flag,m,time}=mousedrag();
+        if flag==0 then return; endif;
+        if flag==2 then
+          hold on; mark(m[1],m[2]); hold off;
+        endif;
+      end
+    endfunction
+</pre>
+\>dragtest // lihat hasilnya dan cobalah lakukan!
+
+
+## Styles of 2D Plots
+
+Secara bawaan (*by default*), EMT akan menghitung tanda sumbu (*axis
+ticks*) secara otomatis dan menambahkan label di setiap tandanya.
+Pengaturan ini dapat diubah menggunakan parameter `grid`. Gaya standar
+dari sumbu dan label juga bisa disesuaikan. Selain itu, kamu bisa
+menambahkan label dan judul secara manual. Untuk mengembalikan semua
+gaya ke tampilan awal (*default*), gunakan fungsi `reset()`.
+
+
+\>aspect();
+
+\>figure(3,4); ...  
+\>    figure(1); plot2d("x^3-x",grid=0); ... // no grid, frame or axis
+
+\> figure(2); plot2d("x^3-x",grid=1); ... // x-y-axis
+
+\> figure(3); plot2d("x^3-x",grid=2); ... // default ticks
+
+\> figure(4); plot2d("x^3-x",grid=3); ... // x-y- axis with labels inside
+
+\> figure(5); plot2d("x^3-x",grid=4); ... // no ticks, only labels
+
+\> figure(6); plot2d("x^3-x",grid=5); ... // default, but no margin
+
+\> figure(7); plot2d("x^3-x",grid=6); ... // axes only
+
+\> figure(8); plot2d("x^3-x",grid=7); ... // axes only, ticks at axis
+
+\> figure(9); plot2d("x^3-x",grid=8); ... // axes only, finer ticks at axis
+
+\> figure(10); plot2d("x^3-x",grid=9); ... // default, small ticks inside
+
+\> figure(11); plot2d("x^3-x",grid=10); ...// no ticks, axes only
+
+\> figure(0):
+
+
+![images/TugasAplikom4Adi25030630001-074.png](images/TugasAplikom4Adi25030630001-074.png)
+
+Parameter `&lt;frame` berfungsi untuk mematikan bingkai (*frame*), dan
+`framecolor=blue` akan mengatur warna bingkai menjadi biru.
+
+
+Jika kamu ingin menentukan tanda sumbu (*ticks*) buatanmu sendiri,
+kamu bisa menggunakan `style=0` dan menambahkan semua elemennya secara
+manual nanti.
+
+
+\>aspect(1.5); 
+
+\>plot2d("x^3-x",grid=0); // plot
+
+\>frame; xgrid([-1,0,1]); ygrid(0): // add frame and grid
+
+
+![images/TugasAplikom4Adi25030630001-075.png](images/TugasAplikom4Adi25030630001-075.png)
+
+Untuk judul grafik (*plot title*) dan label sumbu (*axis labels*),
+silakan lihat contoh berikut.
+
+
+\>plot2d("exp(x)",-1,1);
+
+\>textcolor(black); // set the text color to black
+
+\>title(latex("y=e^x")); // title above the plot
+
+\>xlabel(latex("x")); // "x" for x-axis
+
+\>ylabel(latex("y"),\>vertical); // vertical "y" for y-axis
+
+\>label(latex("(0,1)"),0,1,color=blue): // label a point
+
+
+![images/TugasAplikom4Adi25030630001-076.png](images/TugasAplikom4Adi25030630001-076.png)
+
+Sumbu grafik juga dapat digambar secara terpisah menggunakan fungsi
+`xaxis()` dan `yaxis()`.
+
+
+\>plot2d("x^3-x",<grid,<frame);
+
+\>xaxis(0,xx=-2:1,style="-\>"); yaxis(0,yy=-5:5,style="-\>"):
+
+
+![images/TugasAplikom4Adi25030630001-077.png](images/TugasAplikom4Adi25030630001-077.png)
+
+Teks pada grafik dapat ditambahkan dengan menggunakan `label()`. Pada
+contoh berikut, `"lc"` berarti *lower center* (tengah bawah).
+Parameter ini mengatur posisi label relatif terhadap koordinat grafik.
+
+
+\>function f(x) &= x^3-x
+
+
+    
+                                     3
+                                    x  - x
+    
+
+\>plot2d(f,-1,1,\>square);
+
+\>x0=fmin(f,0,1); // compute point of minimum
+
+\>label("Rel. Min.",x0,f(x0),pos="lc"): // add a label there
+
+
+![images/TugasAplikom4Adi25030630001-078.png](images/TugasAplikom4Adi25030630001-078.png)
+
+Terdapat juga fitur kotak teks (*text boxes*).
+
+
+\>plot2d(&f(x),-1,1,-2,2); // function
+
+\>plot2d(&diff(f(x),x),\>add,style="--",color=red); // derivative
+
+\>labelbox(["f","f'"],["-","--"],[black,red]): // label box
+
+
+![images/TugasAplikom4Adi25030630001-079.png](images/TugasAplikom4Adi25030630001-079.png)
+
+\>plot2d(["exp(x)","1+x"],color=[black,blue],style=["-","-.-"]):
+
+
+![images/TugasAplikom4Adi25030630001-080.png](images/TugasAplikom4Adi25030630001-080.png)
+
+\>gridstyle("-\>",color=gray,textcolor=gray,framecolor=gray);  ...  
+\>    plot2d("x^3-x",grid=1);   ...  
+\>    settitle("y=x^3-x",color=black); ...  
+\>    label("x",2,0,pos="bc",color=gray);  ...  
+\>    label("y",0,6,pos="cl",color=gray); ...  
+\>    reset():
+
+
+![images/TugasAplikom4Adi25030630001-081.png](images/TugasAplikom4Adi25030630001-081.png)
+
+Untuk kendali yang jauh lebih fleksibel, sumbu-x dan sumbu-y dapat
+dibuat secara manual.
+
+
+Perintah `fullwindow()` berfungsi untuk memperluas jendela grafik
+(*plot window*) karena kita tidak lagi membutuhkan ruang untuk label
+di luar jendela tersebut. Gunakan `shrinkwindow()` atau `reset()`
+untuk mengembalikan ukurannya ke pengaturan awal (*default*).
+
+
+\>fullwindow; ...  
+\>    gridstyle(color=darkgray,textcolor=darkgray); ...  
+\>    plot2d(["2^x","1","2^(-x)"],a=-2,b=2,c=0,d=4,<grid,color=4:6,<frame); ...  
+\>    xaxis(0,-2:1,style="-\>"); xaxis(0,2,"x",<axis); ...  
+\>    yaxis(0,4,"y",style="-\>"); ...  
+\>    yaxis(-2,1:4,\>left); ...  
+\>    yaxis(2,2^(-2:2),style=".",<left); ...  
+\>    labelbox(["2^x","1","2^-x"],colors=4:6,x=0.8,y=0.2); ...  
+\>    reset:
+
+
+![images/TugasAplikom4Adi25030630001-082.png](images/TugasAplikom4Adi25030630001-082.png)
+
+Berikut adalah contoh lainnya, di mana *string* Unicode digunakan
+serta sumbu ditempatkan di luar area grafik (*plot area*).
+
+
+\>aspect(1.5); 
+
+\>plot2d(["sin(x)","cos(x)"],0,2pi,color=[red,green],<grid,<frame); ...  
+\>    xaxis(-1.1,(0:2)\*pi,xt=["0",u"&pi;",u"2&pi;"],style="-",\>ticks,\>zero);  ...  
+\>    xgrid((0:0.5:2)\*pi,<ticks); ...  
+\>    yaxis(-0.1\*pi,-1:0.2:1,style="-",\>zero,\>grid); ...  
+\>    labelbox(["sin","cos"],colors=[red,green],x=0.5,y=0.2,\>left); ...  
+\>    xlabel(u"&phi;"); ylabel(u"f(&phi;)"):
+
+
+![images/TugasAplikom4Adi25030630001-083.png](images/TugasAplikom4Adi25030630001-083.png)
+
+# Plotting 2D Data
+
+Jika x dan y adalah vektor data, data tersebut akan digunakan sebagai
+koordinat-x dan koordinat-y dari sebuah kurva. Dalam hal ini,
+parameter a, b, c, dan d, atau jari-jari r dapat ditentukan, atau
+jendela grafik (*plot window*) akan menyesuaikan ukurannya secara
+otomatis mengikuti data tersebut. Opsi lainnya, `&gt;square` dapat diatur
+untuk mempertahankan rasio aspek persegi (*square aspect ratio*).
+
+
+Menggambar grafik dari suatu ekspresi sebenarnya hanyalah bentuk
+singkat dari grafik data (*data plots*). Untuk grafik data, kamu
+memerlukan satu atau beberapa baris nilai-x, serta satu atau beberapa
+baris nilai-y. Dari rentang (*range*) dan nilai-x yang ada, fungsi
+`plot2d` akan menghitung data yang akan digambar, secara bawaan
+menggunakan evaluasi adaptif dari fungsi tersebut. Untuk grafik titik
+(*point plots*), gunakan `&gt;points`, sedangkan untuk gabungan garis dan
+titik, gunakan `&gt;addpoints`.
+
+
+Namun, kamu juga bisa memasukkan data secara langsung.
+
+
+* 
+Gunakan vektor baris untuk x dan y untuk satu fungsi.
+
+* 
+Matriks untuk x dan y akan digambar baris demi baris.
+
+
+Berikut adalah contoh dengan satu baris untuk x dan y.
+
+
+\>x=-10:0.1:10; y=exp(-x^2)\*x; plot2d(x,y):
+
+
+![images/TugasAplikom4Adi25030630001-084.png](images/TugasAplikom4Adi25030630001-084.png)
+
+Data juga dapat digambarkan sebagai titik-titik (*points*). Gunakan
+`points=true` untuk opsi ini. Grafik titik ini bekerja layaknya
+poligon, namun hanya menggambar bagian sudut-sudutnya saja.
+
+
+* 
+`style="..."`: Pilih simbol dari opsi yang tersedia: `"[]"`, `"&lt;&gt;"`,
+* `"o"`, `"."`, `".."`", `"+"`, ` "*"`, `"[]#"`, `"&lt;&gt;#"`, `"o#"`,
+* `"..#"`, `"#"`, `"|"`.
+
+
+Untuk menggambarkan kumpulan titik, gunakan opsi `&gt;points`. Jika
+parameter warna berupa vektor warna, maka setiap titik akan
+mendapatkan warna yang berbeda. Untuk matriks koordinat dan vektor
+kolom warna, warna tersebut akan diterapkan pada setiap baris matriks.
+
+
+Parameter `&gt;addpoints` berfungsi untuk menambahkan titik-titik pada
+segmen garis untuk grafik data.
+
+
+\>xdata=[1,1.5,2.5,3,4]; ydata=[3,3.1,2.8,2.9,2.7]; // data
+
+\>plot2d(xdata,ydata,a=0.5,b=4.5,c=2.5,d=3.5,style="."); // lines
+
+\>plot2d(xdata,ydata,\>points,\>add,style="o"): // add points
+
+
+![images/TugasAplikom4Adi25030630001-085.png](images/TugasAplikom4Adi25030630001-085.png)
+
+\>p=polyfit(xdata,ydata,1); // get regression line
+
+\>plot2d("polyval(p,x)",\>add,color=red): // add plot of line
+
+
+![images/TugasAplikom4Adi25030630001-086.png](images/TugasAplikom4Adi25030630001-086.png)
+
+# Menggambar Daerah Yang Dibatasi Kurva
+
+Grafik data sebenarnya adalah poligon. Kita juga dapat membuat grafik
+kurva (*curves*) atau kurva terisi (*filled curves*).
+
+
+* 
+`filled=true`: Mengisi area di dalam grafik.
+
+* 
+`style="..."`: Pilih gaya arsiran dari opsi `"#"`, `"/"`, `"\"`,
+* atau `"\\/"`.
+
+* 
+`fillcolor`: Lihat opsi warna yang tersedia di atas untuk menentukan
+* warna isian.
+
+
+Warna isian ditentukan oleh argumen `fillcolor`, dan opsi `&lt;outline`
+secara opsional mencegah penggambaran garis batas (*boundary*) untuk
+semua gaya, kecuali gaya bawaan (*default*).
+
+
+\>t=linspace(0,2pi,1000); // parameter for curve
+
+\>x=sin(t)\*exp(t/pi); y=cos(t)\*exp(t/pi); // x(t) and y(t)
+
+\>figure(1,2); aspect(16/9)
+
+\>figure(1); plot2d(x,y,r=10); // plot curve
+
+\>figure(2); plot2d(x,y,r=10,\>filled,style="/",fillcolor=red); // fill curve
+
+\>figure(0):
+
+
+![images/TugasAplikom4Adi25030630001-087.png](images/TugasAplikom4Adi25030630001-087.png)
+
+Pada contoh-contoh berikut, kita menggambar sebuah elips terisi
+(*filled ellipse*) dan dua segi enam terisi (*filled hexagons*)
+menggunakan kurva tertutup dengan 6 titik serta gaya isian (*fill
+style*) yang berbeda.
+
+
+\>x=linspace(0,2pi,1000); plot2d(sin(x),cos(x)\*0.5,r=1,\>filled,style="/"):
+
+
+![images/TugasAplikom4Adi25030630001-088.png](images/TugasAplikom4Adi25030630001-088.png)
+
+\>t=linspace(0,2pi,6); ...  
+\>   plot2d(cos(t),sin(t),\>filled,style="/",fillcolor=red,r=1.2):
+
+
+![images/TugasAplikom4Adi25030630001-089.png](images/TugasAplikom4Adi25030630001-089.png)
+
+\>t=linspace(0,2pi,6); plot2d(cos(t),sin(t),\>filled,style="#"):
+
+
+![images/TugasAplikom4Adi25030630001-090.png](images/TugasAplikom4Adi25030630001-090.png)
+
+Contoh lainnya adalah segi tujuh (*septagon*), yang kita buat
+menggunakan 7 titik pada lingkaran satuan (*unit circle*).
+
+
+\>t=linspace(0,2pi,7);  ...  
+\>    plot2d(cos(t),sin(t),r=1,\>filled,style="/",fillcolor=red):
+
+
+![images/TugasAplikom4Adi25030630001-091.png](images/TugasAplikom4Adi25030630001-091.png)
+
+Berikut adalah himpunan nilai maksimum dari empat kondisi linear yang
+kurang dari atau sama dengan 3. Ini dinyatakan sebagai $A[k] \cdot v
+\le 3$ untuk setiap baris dari $A$. Untuk mendapatkan sudut yang halus
+(*nice corners*), kita menggunakan $n$ yang relatif besar.
+
+
+\>A=[2,1;1,2;-1,0;0,-1];
+
+\>function f(x,y) := max([x,y].A');
+
+\>plot2d("f",r=4,level=[0;3],color=green,n=111):
+
+
+![images/TugasAplikom4Adi25030630001-092.png](images/TugasAplikom4Adi25030630001-092.png)
+
+Poin utama dari bahasa matriks adalah bahwa ia memungkinkan kita untuk
+membuat tabel fungsi secara mudah.
+
+
+\>t=linspace(0,2pi,1000); x=cos(3\*t); y=sin(4\*t);
+
+
+Sekarang kita memiliki vektor nilai $x$ dan $y$. Fungsi `plot2d()`
+dapat menggambarkan nilai-nilai ini sebagai kurva yang menghubungkan
+titik-titiknya. Grafik tersebut juga dapat diisi (*filled*). Dalam hal
+ini, opsi tersebut menghasilkan tampilan yang menarik berkat aturan
+winding (*winding rule*) yang digunakan untuk pengisiannya.
+
+
+\>plot2d(x,y,<grid,<frame,\>filled):
+
+
+![images/TugasAplikom4Adi25030630001-093.png](images/TugasAplikom4Adi25030630001-093.png)
+
+Vektor interval digambarkan terhadap nilai-nilai $x$ sebagai wilayah
+yang terisi (*filled region*) di antara nilai bawah (*lower values*)
+dan nilai atas (*upper values*) dari interval tersebut.
+
+
+Fitur ini sangat berguna untuk menggambarkan kesalahan atau margin
+galat (*errors*) dari hasil perhitungan. Selain itu, opsi ini juga
+dapat digunakan untuk menampilkan galat statistik (*statistical
+errors*).
+
+
+\>t=0:0.1:1; ...  
+\>    plot2d(t,interval(t-random(size(t)),t+random(size(t))),style="|");  ...  
+\>    plot2d(t,t,add=true):
+
+
+![images/TugasAplikom4Adi25030630001-094.png](images/TugasAplikom4Adi25030630001-094.png)
+
+Jika x adalah vektor yang terurut, dan $y$ adalah vektor interval,
+maka `plot2d` akan menggambarkan area interval yang terisi (*filled
+ranges*) pada bidang grafik. Gaya isiannya (*fill styles*) sama dengan
+gaya yang digunakan pada poligon.
+
+
+\>t=-1:0.01:1; x=~t-0.01,t+0.01~; y=x^3-x;
+
+\>plot2d(t,y):
+
+
+![images/TugasAplikom4Adi25030630001-095.png](images/TugasAplikom4Adi25030630001-095.png)
+
+Memungkinkan juga untuk mengisi area (*regions*) nilai bagi suatu
+fungsi tertentu. Untuk melakukan hal ini, parameter `level` harus
+berupa matriks berukuran $2 \times n$. Baris pertama berisi
+batas-batas bawah (*lower bounds*), sedangkan baris kedua berisi
+batas-batas atas (*upper bounds*).
+
+
+\>expr := "2\*x^2+x\*y+3\*y^4+y"; // define an expression f(x,y)
+
+\>plot2d(expr,level=[0;1],style="-",color=blue): // 0 <= f(x,y) <= 1
+
+
+![images/TugasAplikom4Adi25030630001-096.png](images/TugasAplikom4Adi25030630001-096.png)
+
+Kita juga bisa mengisi rentang nilai seperti
+
+
+$$-1 \le (x^2+y^2)^2-x^2+y^2 \le 0.$$\>plot2d("(x^2+y^2)^2-x^2+y^2",r=1.2,level=[-1;0],style="/"):
+
+
+![images/TugasAplikom4Adi25030630001-098.png](images/TugasAplikom4Adi25030630001-098.png)
+
+\>plot2d("cos(x)","sin(x)^3",xmin=0,xmax=2pi,\>filled,style="/"):
+
+
+![images/TugasAplikom4Adi25030630001-099.png](images/TugasAplikom4Adi25030630001-099.png)
+
+# Grafik Fungsi Parametrik
+
+Nilai-$x$ tidak harus terurut. Pasangan $(x,y)$ hanya menggambarkan
+sebuah kurva. Jika nilai $x$ terurut, maka kurva tersebut merupakan
+grafik dari suatu fungsi.
+
+
+Pada contoh berikut, kita menggambarkan spiral
+
+
+$$\gamma(t) = t \cdot (\cos(2\pi t),\sin(2\pi t))$$Kita dapat menggunakan titik yang sangat banyak agar tampilannya
+halus, atau menggunakan fungsi `adaptive()` untuk mengevaluasi
+ekspresi tersebut (lihat fungsi `adaptive()` untuk detail lebih
+lanjut).
+
+
+\>t=linspace(0,1,1000); ...  
+\>   plot2d(t\*cos(2\*pi\*t),t\*sin(2\*pi\*t),r=1):
+
+
+![images/TugasAplikom4Adi25030630001-101.png](images/TugasAplikom4Adi25030630001-101.png)
+
+Sebagai alternatif, kamu juga dapat menggunakan dua ekspresi untuk
+membuat kurva. Contoh berikut menggambarkan kurva yang sama seperti di
+atas.
+
+
+\>plot2d("x\*cos(2\*pi\*x)","x\*sin(2\*pi\*x)",xmin=0,xmax=1,r=1):
+
+
+![images/TugasAplikom4Adi25030630001-102.png](images/TugasAplikom4Adi25030630001-102.png)
+
+\>t=linspace(0,1,1000); r=exp(-t); x=r\*cos(2pi\*t); y=r\*sin(2pi\*t);
+
+\>plot2d(x,y,r=1):
+
+
+![images/TugasAplikom4Adi25030630001-103.png](images/TugasAplikom4Adi25030630001-103.png)
+
+Pada contoh berikutnya, kita menggambarkan kurva
+
+
+$$\gamma(t) = (r(t) \cos(t), r(t) \sin(t))$$dengan
+
+
+$$r(t) = 1 + \dfrac{\sin(3t)}{2}.$$\>t=linspace(0,2pi,1000); r=1+sin(3\*t)/2; x=r\*cos(t); y=r\*sin(t); ...  
+\>   plot2d(x,y,\>filled,fillcolor=red,style="/",r=1.5):
+
+
+![images/TugasAplikom4Adi25030630001-106.png](images/TugasAplikom4Adi25030630001-106.png)
+
+# Menggambar Grafik Bilangan Kompleks
+
+Larik (*array*) angka kompleks juga dapat digambarkan. Dengan
+demikian, titik-titik kisi (*grid points*) akan saling dihubungkan.
+Jika jumlah garis kisi ditentukan (atau menggunakan vektor $1 \times
+2$ untuk garis kisi) pada argumen `cgrid`, hanya garis-garis kisi
+tersebut yang akan ditampilkan.
+
+
+Matriks angka kompleks akan digambarkan secara otomatis sebagai kisi
+pada bidang kompleks (*complex plane*).
+
+
+Pada contoh berikut, kita menggambarkan bayangan dari lingkaran satuan
+(*unit circle*) di bawah fungsi eksponensial. Parameter `cgrid`
+menyembunyikan beberapa kurva kisi tersebut.
+
+
+\>aspect(); r=linspace(0,1,50); a=linspace(0,2pi,80)'; z=r\*exp(I\*a);...  
+\>   plot2d(z,a=-1.25,b=1.25,c=-1.25,d=1.25,cgrid=10):
+
+
+![images/TugasAplikom4Adi25030630001-107.png](images/TugasAplikom4Adi25030630001-107.png)
+
+\>aspect(1.25); r=linspace(0,1,50); a=linspace(0,2pi,200)'; z=r\*exp(I\*a);
+
+\>plot2d(exp(z),cgrid=[40,10]):
+
+
+![images/TugasAplikom4Adi25030630001-108.png](images/TugasAplikom4Adi25030630001-108.png)
+
+\>r=linspace(0,1,10); a=linspace(0,2pi,40)'; z=r\*exp(I\*a);
+
+\>plot2d(exp(z),\>points,\>add):
+
+
+![images/TugasAplikom4Adi25030630001-109.png](images/TugasAplikom4Adi25030630001-109.png)
+
+Vektor bilangan kompleks digambarkan secara otomatis sebagai kurva
+pada bidang kompleks (complex plane) dengan bagian real dan bagian
+imajiner.
+
+
+Pada contoh ini, kita menggambar lingkaran satuan (unit circle) dengan
+
+
+$$\gamma(t) = e^{it}$$\>t=linspace(0,2pi,1000); ...  
+\>   plot2d(exp(I\*t)+exp(4\*I\*t),r=2):
+
+
+![images/TugasAplikom4Adi25030630001-111.png](images/TugasAplikom4Adi25030630001-111.png)
+
+# Statistical Plots
+
+Terdapat banyak fungsi yang dikhususkan untuk grafik statistik. Salah
+satu grafik yang paling sering digunakan adalah grafik kolom (*column
+plot*).
+
+
+Jumlah kumulatif (*cumulative sum*) dari nilai-nilai terdistribusi
+normal (0,1) menghasilkan langkah acak (*random walk*).
+
+
+\>plot2d(cumsum(randnormal(1,1000))):
+
+
+![images/TugasAplikom4Adi25030630001-112.png](images/TugasAplikom4Adi25030630001-112.png)
+
+Menggunakan dua baris akan menampilkan langkah acak (*random walk*)
+dalam dua dimensi.
+
+
+\>X=cumsum(randnormal(2,1000)); plot2d(X[1],X[2]):
+
+
+![images/TugasAplikom4Adi25030630001-113.png](images/TugasAplikom4Adi25030630001-113.png)
+
+\>columnsplot(cumsum(random(10)),style="/",color=blue):
+
+
+![images/TugasAplikom4Adi25030630001-114.png](images/TugasAplikom4Adi25030630001-114.png)
+
+Opsi ini juga dapat menampilkan string teks sebagai label (*labels*).
+
+
+\>months=["Jan","Feb","Mar","Apr","May","Jun", ...  
+\>     "Jul","Aug","Sep","Oct","Nov","Dec"];
+
+\>values=[10,12,12,18,22,28,30,26,22,18,12,8];
+
+\>columnsplot(values,lab=months,color=red,style="-");
+
+\>title("Temperature"):
+
+
+![images/TugasAplikom4Adi25030630001-115.png](images/TugasAplikom4Adi25030630001-115.png)
+
+\>k=0:10;
+
+\>plot2d(k,bin(10,k),\>bar):
+
+
+![images/TugasAplikom4Adi25030630001-116.png](images/TugasAplikom4Adi25030630001-116.png)
+
+\>plot2d(k,bin(10,k)); plot2d(k,bin(10,k),\>points,\>add):
+
+
+![images/TugasAplikom4Adi25030630001-117.png](images/TugasAplikom4Adi25030630001-117.png)
+
+\>plot2d(normal(1000),normal(1000),\>points,grid=6,style=".."):
+
+
+![images/TugasAplikom4Adi25030630001-118.png](images/TugasAplikom4Adi25030630001-118.png)
+
+\>plot2d(normal(1,1000),\>distribution,style="O"):
+
+
+![images/TugasAplikom4Adi25030630001-119.png](images/TugasAplikom4Adi25030630001-119.png)
+
+\>plot2d("qnormal",0,5;2.5,0.5,\>filled):
+
+
+![images/TugasAplikom4Adi25030630001-120.png](images/TugasAplikom4Adi25030630001-120.png)
+
+Untuk menggambarkan distribusi statistik eksperimental, kamu dapat
+menggunakan argumen `distribution=n` pada `plot2d()`.
+
+
+\>w=randexponential(1,1000); // exponential distribution
+
+\>plot2d(w,\>distribution): // or distribution=n with n intervals
+
+
+![images/TugasAplikom4Adi25030630001-121.png](images/TugasAplikom4Adi25030630001-121.png)
+
+Atau kamu dapat menghitung distribusi dari data tersebut dan
+menggambar hasilnya menggunakan argumen `&gt;bar` pada `plot3d`, atau
+dengan grafik kolom (*column plot*).
+
+
+\>w=normal(1000); // 0-1-normal distribution
+
+\>{x,y}=histo(w,10,v=[-6,-4,-2,-1,0,1,2,4,6]); // interval bounds v
+
+\>plot2d(x,y,\>bar):
+
+
+![images/TugasAplikom4Adi25030630001-122.png](images/TugasAplikom4Adi25030630001-122.png)
+
+Fungsi `statplot()` mengatur gaya grafik (*style*) menggunakan string
+sederhana.
+
+
+\>statplot(1:10,cumsum(random(10)),"b"):
+
+
+![images/TugasAplikom4Adi25030630001-123.png](images/TugasAplikom4Adi25030630001-123.png)
+
+\>n=10; i=0:n; ...  
+\>   plot2d(i,bin(n,i)/2^n,a=0,b=10,c=0,d=0.3); ...  
+\>   plot2d(i,bin(n,i)/2^n,points=true,style="ow",add=true,color=blue):
+
+
+![images/TugasAplikom4Adi25030630001-124.png](images/TugasAplikom4Adi25030630001-124.png)
+
+Selain itu, data juga dapat digambarkan dalam bentuk batang (*bars*).
+Dalam hal ini, $x$ harus terurut dan memiliki jumlah elemen satu lebih
+banyak daripada $y$. Batang-batang tersebut akan membentang dari
+$x[i]$ hingga $x[i+1]$ dengan nilai $y[i]$. Jika $x$ memiliki ukuran
+yang sama dengan $y$, maka $x$ akan diperpanjang satu elemen secara
+otomatis dengan jarak (*spacing*) yang sama seperti elemen terakhir.
+
+
+Gaya isian (*fill styles*) dapat digunakan persis seperti pada contoh
+di atas.
+
+
+\>n=10; k=bin(n,0:n); ...  
+\>   plot2d(-0.5:n+0.5,k,bar=true,fillcolor=lightgray):
+
+
+![images/TugasAplikom4Adi25030630001-125.png](images/TugasAplikom4Adi25030630001-125.png)
+
+Data untuk grafik batang (`bar=1`) dan histogram (`histogram=1`) dapat
+diberikan secara eksplisit melalui `xv` dan `yv`, atau dihitung
+langsung dari distribusi eksperimental pada `xv` menggunakan argumen
+`&gt;distribution` (atau `distribution=n`). Histogram dari nilai-nilai
+`xv` akan dihitung secara otomatis jika menggunakan `&gt;histogram`. Jika
+argumen `&gt;even` ditentukan, maka nilai-nilai `xv` akan dihitung dalam
+rentang interval bilangan bulat (*integer intervals*).
+
+
+\>plot2d(normal(10000),distribution=50):
+
+
+![images/TugasAplikom4Adi25030630001-126.png](images/TugasAplikom4Adi25030630001-126.png)
+
+\>k=0:10; m=bin(10,k); x=(0:11)-0.5; plot2d(x,m,\>bar):
+
+
+![images/TugasAplikom4Adi25030630001-127.png](images/TugasAplikom4Adi25030630001-127.png)
+
+\>columnsplot(m,k):
+
+
+![images/TugasAplikom4Adi25030630001-128.png](images/TugasAplikom4Adi25030630001-128.png)
+
+\>plot2d(random(600)\*6,histogram=6):
+
+
+![images/TugasAplikom4Adi25030630001-129.png](images/TugasAplikom4Adi25030630001-129.png)
+
+Untuk distribusi data, terdapat parameter `distribution=n` yang akan
+menghitung nilai-nilai secara otomatis dan menampilkan distribusi
+relatifnya dengan $n$ sub-interval.
+
+
+\>plot2d(normal(1,1000),distribution=10,style="\\/"):
+
+
+![images/TugasAplikom4Adi25030630001-130.png](images/TugasAplikom4Adi25030630001-130.png)
+
+Dengan parameter `even=true`, ini akan menggunakan interval bilangan
+bulat (*integer intervals*).
+
+
+\>plot2d(intrandom(1,1000,10),distribution=10,even=true):
+
+
+![images/TugasAplikom4Adi25030630001-131.png](images/TugasAplikom4Adi25030630001-131.png)
+
+Perlu diingat bahwa terdapat banyak grafik statistik lainnya yang
+sangat berguna. Kamu bisa melihat panduan/tutorial tentang statistik
+untuk pembahasan yang lebih lengkap.
+
+
+\>columnsplot(getmultiplicities(1:6,intrandom(1,6000,6))):
+
+
+![images/TugasAplikom4Adi25030630001-132.png](images/TugasAplikom4Adi25030630001-132.png)
+
+\>plot2d(normal(1,1000),\>distribution); ...  
+\>     plot2d("qnormal(x)",color=red,thickness=2,\>add):
+
+
+![images/TugasAplikom4Adi25030630001-133.png](images/TugasAplikom4Adi25030630001-133.png)
+
+Terdapat juga berbagai grafik khusus untuk statistik. *Boxplot*
+menampilkan kuartil dari distribusi data serta pencilan (*outliers*).
+Secara definisi, pencilan pada *boxplot* adalah data yang nilainya
+melebihi 1,5 kali rentang 50% data bagian tengah (*interquartile
+range*).
+
+
+\>M=normal(5,1000); boxplot(quartiles(M)):
+
+
+![images/TugasAplikom4Adi25030630001-134.png](images/TugasAplikom4Adi25030630001-134.png)
+
+# Implicit Functions
+
+Grafik implisit (*implicit plots*) menampilkan garis kontur/tingkat
+(*level lines*) yang menyelesaikan persamaan $f(x,y)=\text{level}$, di
+mana `level` dapat berupa nilai tunggal atau vektor nilai. Jika
+`level="auto"`, akan terdapat `nc` garis kontur yang tersebar secara
+merata antara nilai minimum dan maksimum dari fungsi tersebut. Warna
+yang lebih gelap atau lebih terang dapat ditambahkan dengan argumen
+`&gt;hue` untuk menunjukkan nilai fungsinya. Untuk fungsi implisit, `xv`
+harus berupa fungsi atau ekspresi dari parameter $x$ dan $y$, atau
+secara alternatif, `xv` dapat berupa matriks nilai.
+
+
+Euler dapat menandai garis kontur
+
+
+$$f(x,y) = c$$dari fungsi apa pun.
+
+
+Untuk menggambar himpunan $f(x,y)=c$ bagi satu atau beberapa konstanta
+$c$, kamu dapat menggunakan `plot2d()` dengan grafik implisit pada
+bidang datar. Parameter untuk $c$ adalah `level=c`, di mana $c$ dapat
+berupa vektor dari garis-garis kontur. Selain itu, skema warna dapat
+digambarkan pada latar belakang untuk menunjukkan nilai fungsi pada
+setiap titik dalam grafik. Parameter `n` menentukan tingkat kehalusan
+(*fineness*) dari grafik tersebut.
+
+
+\>aspect(1.5); 
+
+\>plot2d("x^2+y^2-x\*y-x",r=1.5,level=0,contourcolor=red):
+
+
+![images/TugasAplikom4Adi25030630001-136.png](images/TugasAplikom4Adi25030630001-136.png)
+
+\>expr := "2\*x^2+x\*y+3\*y^4+y"; // define an expression f(x,y)
+
+\>plot2d(expr,level=0): // Solutions of f(x,y)=0
+
+
+![images/TugasAplikom4Adi25030630001-137.png](images/TugasAplikom4Adi25030630001-137.png)
+
+\>plot2d(expr,level=0:0.5:20,\>hue,contourcolor=white,n=200): // nice
+
+
+![images/TugasAplikom4Adi25030630001-138.png](images/TugasAplikom4Adi25030630001-138.png)
+
+\>plot2d(expr,level=0:0.5:20,\>hue,\>spectral,n=200,grid=4): // nicer
+
+
+![images/TugasAplikom4Adi25030630001-139.png](images/TugasAplikom4Adi25030630001-139.png)
+
+Opsi ini juga berlaku untuk grafik data (*data plots*). Namun, kamu
+harus menentukan rentang (*ranges*) untuk label sumbunya secara
+manual.
+
+
+\>x=-2:0.05:1; y=x'; z=expr(x,y);
+
+\>plot2d(z,level=0,a=-1,b=2,c=-2,d=1,\>hue):
+
+
+![images/TugasAplikom4Adi25030630001-140.png](images/TugasAplikom4Adi25030630001-140.png)
+
+\>plot2d("x^3-y^2",\>contour,\>hue,\>spectral):
+
+
+![images/TugasAplikom4Adi25030630001-141.png](images/TugasAplikom4Adi25030630001-141.png)
+
+\>plot2d("x^3-y^2",level=0,contourwidth=3,\>add,contourcolor=red):
+
+
+![images/TugasAplikom4Adi25030630001-142.png](images/TugasAplikom4Adi25030630001-142.png)
+
+\>z=z+normal(size(z))\*0.2;
+
+\>plot2d(z,level=0.5,a=-1,b=2,c=-2,d=1):
+
+
+![images/TugasAplikom4Adi25030630001-143.png](images/TugasAplikom4Adi25030630001-143.png)
+
+\>plot2d(expr,level=[0:0.2:5;0.05:0.2:5.05],color=lightgray):
+
+
+![images/TugasAplikom4Adi25030630001-144.png](images/TugasAplikom4Adi25030630001-144.png)
+
+\>plot2d("x^2+y^3+x\*y",level=1,r=4,n=100):
+
+
+![images/TugasAplikom4Adi25030630001-145.png](images/TugasAplikom4Adi25030630001-145.png)
+
+\>plot2d("x^2+2\*y^2-x\*y",level=0:0.1:10,n=100,contourcolor=white,\>hue):
+
+
+![images/TugasAplikom4Adi25030630001-146.png](images/TugasAplikom4Adi25030630001-146.png)
+
+Memungkinkan juga untuk mengisi daerah himpunan
+
+
+$$a \le f(x,y) \le b$$dengan rentang tingkat (*level range*).
+
+
+Kamu dapat mengisi daerah nilai untuk fungsi tertentu. Untuk melakukan
+hal ini, parameter `level` harus berupa matriks berukuran $2 \times
+n$. Baris pertama berisi batas-batas bawah (*lower bounds*) dan baris
+kedua berisi batas-batas atas (*upper bounds*).
+
+
+\>plot2d(expr,level=[0;1],style="-",color=blue): // 0 <= f(x,y) <= 1
+
+
+![images/TugasAplikom4Adi25030630001-148.png](images/TugasAplikom4Adi25030630001-148.png)
+
+Grafik implisit (*implicit plots*) juga dapat menampilkan rentang
+tingkat (*ranges of levels*). Untuk melakukannya, `level` harus berupa
+matriks berukuran $2 \times n$ dari interval tingkat, di mana baris
+pertama berisi nilai awal dan baris kedua berisi nilai akhir dari
+setiap interval. Secara alternatif, sebuah vektor baris sederhana
+dapat digunakan untuk `level`, dan parameter `dl` digunakan untuk
+memperluas nilai-nilai `level` tersebut menjadi interval.
+
+
+\>plot2d("x^4+y^4",r=1.5,level=[0;1],color=blue,style="/"):
+
+
+![images/TugasAplikom4Adi25030630001-149.png](images/TugasAplikom4Adi25030630001-149.png)
+
+\>plot2d("x^2+y^3+x\*y",level=[0,2,4;1,3,5],style="/",r=2,n=100):
+
+
+![images/TugasAplikom4Adi25030630001-150.png](images/TugasAplikom4Adi25030630001-150.png)
+
+\>plot2d("x^2+y^3+x\*y",level=-10:20,r=2,style="-",dl=0.1,n=100):
+
+
+![images/TugasAplikom4Adi25030630001-151.png](images/TugasAplikom4Adi25030630001-151.png)
+
+\>plot2d("sin(x)\*cos(y)",r=pi,\>hue,\>levels,n=100):
+
+
+![images/TugasAplikom4Adi25030630001-152.png](images/TugasAplikom4Adi25030630001-152.png)
+
+Dimungkinkan juga untuk menandai suatu daerah
+
+
+$$a \le f(x,y) \le b.$$Hal ini dilakukan dengan menambahkan parameter `level` yang terdiri
+dari dua baris.
+
+
+\>plot2d("(x^2+y^2-1)^3-x^2\*y^3",r=1.3, ...  
+\>     style="#",color=red,<outline, ...  
+\>     level=[-2;0],n=100):
+
+
+![images/TugasAplikom4Adi25030630001-154.png](images/TugasAplikom4Adi25030630001-154.png)
+
+Memungkinkan juga untuk menentukan nilai tingkat (level) tertentu.
+Sebagai contoh, kita dapat menggambar grafik dari solusi suatu
+persamaan seperti
+
+
+$$x^3-xy+x^2y^2=6$$\>plot2d("x^3-x\*y+x^2\*y^2",r=6,level=1,n=100):
+
+
+![images/TugasAplikom4Adi25030630001-156.png](images/TugasAplikom4Adi25030630001-156.png)
+
+\>function starplot1 (v, style="/", color=green, lab=none) ...
+
+
+      if !holding() then clg; endif;
+      w=window(); window(0,0,1024,1024);
+      h=holding(1);
+      r=max(abs(v))*1.2;
+      setplot(-r,r,-r,r);
+      n=cols(v); t=linspace(0,2pi,n);
+      v=v|v[1]; c=v*cos(t); s=v*sin(t);
+      cl=barcolor(color); st=barstyle(style);
+      loop 1 to n
+        polygon([0,c[#],c[#+1]],[0,s[#],s[#+1]],1);
+        if lab!=none then
+          rlab=v[#]+r*0.1;
+          {col,row}=toscreen(cos(t[#])*rlab,sin(t[#])*rlab);
+          ctext(""+lab[#],col,row-textheight()/2);
+        endif;
+      end;
+      barcolor(cl); barstyle(st);
+      holding(h);
+      window(w);
+    endfunction
+</pre>
+Tidak ada kisi-kisi (*grid*) maupun tanda centang sumbu (*axis ticks*)
+di sini. Selain itu, kita menggunakan seluruh jendela (*full window*)
+untuk plot tersebut.
+
+
+Kita memanggil fungsi `reset()` sebelum menguji plot ini untuk
+mengembalikan pengaturan bawaan grafis (*graphics defaults*). Hal ini
+tidak wajib dilakukan jika kamu sudah yakin bahwa plot tersebut
+bekerja dengan baik.
+
+
+\>reset; starplot1(normal(1,10)+5,color=red,lab=1:10):
+
+
+![images/TugasAplikom4Adi25030630001-157.png](images/TugasAplikom4Adi25030630001-157.png)
+
+Terkadang, kamu mungkin ingin menggambar sesuatu yang hampir bisa
+dilakukan oleh `plot2d`, namun tidak didukung secara langsung.
+
+
+Pada fungsi berikut, kita membuat plot impuls logaritmik (*logarithmic
+impulse plot*). Fungsi `plot2d` memang mampu membuat plot logaritmik,
+namun tidak untuk batang impuls (*impulse bars*).
+
+
+\>function logimpulseplot1 (x,y) ...
+
+
+      {x0,y0}=makeimpulse(x,log(y)/log(10));
+      plot2d(x0,y0,>bar,grid=0);
+      h=holding(1);
+      frame();
+      xgrid(ticks(x));
+      p=plot();
+      for i=-10 to 10;
+        if i<=p[4] and i>=p[3] then
+           ygrid(i,yt="10^"+i);
+        endif;
+      end;
+      holding(h);
+    endfunction
+</pre>
+Mari kita uji dengan nilai-nilai yang berdistribusi eksponensial.
+
+
+\>aspect(1.5); x=1:10; y=-log(random(size(x)))\*200; ...  
+\>   logimpulseplot1(x,y):
+
+
+![images/TugasAplikom4Adi25030630001-158.png](images/TugasAplikom4Adi25030630001-158.png)
+
+Mari kita buat animasi kurva 2D menggunakan grafik langsung (*direct
+plots*). Perintah `plot(x,y)` secara sederhana menggambar sebuah kurva
+ke dalam jendela grafik. Fungsi `setplot(a,b,c,d)` digunakan untuk
+mengatur batas-batas jendela tersebut.
+
+
+Fungsi `wait(0)` memaksa grafik untuk langsung ditampilkan pada
+jendela grafis. Jika tidak, proses menggambar ulang (*redraw*) hanya
+akan terjadi dalam interval waktu yang sporadis/jarang.
+
+
+\>function animliss (n,m) ...
+
+
+    t=linspace(0,2pi,500);
+    f=0;
+    c=framecolor(0);
+    l=linewidth(2);
+    setplot(-1,1,-1,1);
+    repeat
+      clg;
+      plot(sin(n*t),cos(m*t+f));
+      wait(0);
+      if testkey() then break; endif;
+      f=f+0.02;
+    end;
+    framecolor(c);
+    linewidth(l);
+    endfunction
+</pre>
+Tekan sembarang tombol untuk menghentikan animasi ini.
+
+
+\>animliss(2,3); // lihat hasilnya, jika sudah puas, tekan ENTER
+
+
+# Logarithmic Plots
+
+EMT menggunakan parameter logplot untuk skala logaritmik.
+
+
+Grafik logaritmik dapat digambar menggunakan skala logaritmik pada
+sumbu $y$ dengan logplot=1, skala logaritmik pada sumbu $x$ dan $y$
+sekaligus dengan logplot=2, atau skala logaritmik hanya pada sumbu $x$
+dengan logplot=3.
+
+
+ - logplot=1: sumbu $y$ logaritmik  
+ - logplot=2: sumbu $x$ dan $y$   
+ - logaritmiklogplot=3: sumbu $x$ logaritmik  
+
+\>plot2d("exp(x^3-x)\*x^2",1,5,logplot=1):
+
+
+![images/TugasAplikom4Adi25030630001-159.png](images/TugasAplikom4Adi25030630001-159.png)
+
+\>plot2d("exp(x+sin(x))",0,100,logplot=1):
+
+
+![images/TugasAplikom4Adi25030630001-160.png](images/TugasAplikom4Adi25030630001-160.png)
+
+\>plot2d("exp(x+sin(x))",10,100,logplot=2):
+
+
+![images/TugasAplikom4Adi25030630001-161.png](images/TugasAplikom4Adi25030630001-161.png)
+
+\>plot2d("gamma(x)",1,10,logplot=1):
+
+
+![images/TugasAplikom4Adi25030630001-162.png](images/TugasAplikom4Adi25030630001-162.png)
+
+\>plot2d("log(x\*(2+sin(x/100)))",10,1000,logplot=3):
+
+
+![images/TugasAplikom4Adi25030630001-163.png](images/TugasAplikom4Adi25030630001-163.png)
+
+Hal ini juga berlaku untuk grafik data (*data plots*).
+
+
+\>x=10^(1:20); y=x^2-x;
+
+\>plot2d(x,y,logplot=2):
+
+
+![images/TugasAplikom4Adi25030630001-164.png](images/TugasAplikom4Adi25030630001-164.png)
+
+\>                                                      
+
+
+# Contoh Penyelesaian Masalah Menggambar Kurva/Plot 2D
+
+## 1. Materi Aljabar (Titik Potong Kurva Parabola dan Garis Linear)
+
+Soal 1: Gambarkan grafik fungsi kuadrat dan fungsi linear berikut pada satu
+bidang koordinat yang sama, serta tentukan dan tandai titik potong kedua kurva tersebut!
+
+
+\>aspect(1.5);
+
+\>plot2d(["x^2 - 2\*x - 3", "x + 1"], a=-3, b=5, c=-5, d=8, ...  
+\>     color=[blue, red], style=["-", "--"], grid=6, ...  
+\>     xl="x", yl="y", title="Titik Potong Parabola dan Garis"); ...  
+\>   plot2d([-1, 4], [0, 5], \>points, style="o#", color=black, \>add); ...  
+\>   label("(-1, 0)", -1, 0, pos="ul", offset=10); ...  
+\>   label("(4, 5)", 4, 5, pos="ul", offset=10); ...  
+\>   labelbox(["f(x) = x^2 - 2x - 3", "g(x) = x + 1"], styles=["-", "--"], colors=[blue, red], x=0.1, y=0.9, \>left):
+
+
+![images/TugasAplikom4Adi25030630001-165.png](images/TugasAplikom4Adi25030630001-165.png)
+
+Penjelasan hasil output:
+Grafik menampilkan kurva parabola terbuka ke atas (biru) yang berpotongan dengan
+garis lurus bergradien positif (merah putus-putus) di dua titik, yaitu (-1, 0) dan (4, 5).
+Titik potong ini sesuai dengan penyelesaian aljabar x^2 - 2x - 3 = x + 1 yang
+menghasilkan akar-akar x = -1 dan x = 4.
+
+
+## 2. Materi Kalkulus (Kurva Fungsi dan Turunan Pertamanya)
+
+Soal 2: Diketahui fungsi polinomial berderajat tiga berikut:
+
+
+Gambarkan grafik f(x) beserta turunan pertamanya f'(x) pada selang [-2.5, 2.5],
+serta tandai titik ekstrem lokal (maksimum dan minimum lokal) pada kurva f(x)!
+
+
+\>function f(x) &= x^3 - 3\*x + 1;
+
+\>plot2d(&f(x), a=-2.5, b=2.5, c=-4, d=5, color=black, thickness=2, grid=6, ...  
+\>     xl="x", yl="y", title="Fungsi Kubik dan Turunannya"); ...  
+\>   plot2d(&diff(f(x), x), \>add, color=blue, style="--"); ...  
+\>   plot2d([-1, 1], [f(-1), f(1)], \>points, style="o#", color=red, \>add); ...  
+\>   label("Maks Lokal (-1, 3)", -1, f(-1), pos="bc", offset=10); ...  
+\>   label("Min Lokal (1, -1)", 1, f(1), pos="tc", offset=10); ...  
+\>   labelbox(["f(x)", "f'(x)"], styles=["-", "--"], colors=[black, blue]):
+
+
+![images/TugasAplikom4Adi25030630001-166.png](images/TugasAplikom4Adi25030630001-166.png)
+
+Penjelasan hasil output:
+Kurva hitam adalah grafik fungsi kubik f(x) = x^3 - 3x + 1, sedangkan kurva biru
+putus-putus adalah turunan pertamanya f'(x) = 3x^2 - 3. Terlihat jelas bahwa
+saat grafik turunan f'(x) memotong sumbu-x (bernilai nol) di x = -1 dan x = 1,
+kurva f(x) mencapai titik stasioner, yaitu titik maksimum lokal di (-1, 3)
+dan titik minimum lokal di (1, -1).
+
+
+## 3. Materi Trigonometri (Perbandingan Amplitudo dan Periode Fungsi Sinus)
+
+Soal 3: Gambarkan grafik kedua fungsi trigonometri berikut pada interval
+
+
+untuk mengamati perbedaan amplitudo dan frekuensinya:
+
+
+\>plot2d(["sin(x)", "2\*sin(3\*x)"], a=0, b=2\*pi, c=-2.5, d=2.5, ...  
+\>     color=[blue, red], style=["-", "-."], grid=6, ...  
+\>     xl="x (radian)", yl="y", title="Perbandingan Amplitudo dan Periode Sinus"); ...  
+\>   labelbox(["sin(x)", "2 sin(3x)"], styles=["-", "-."], colors=[blue, red]):
+
+
+![images/TugasAplikom4Adi25030630001-167.png](images/TugasAplikom4Adi25030630001-167.png)
+
+Penjelasan hasil output:
+Grafik biru menunjukkan fungsi dasar sin(x) dengan amplitudo 1 dan 1 gelombang penuh
+(periode 2*pi) pada selang [0, 2*pi]. Grafik merah menunjukkan fungsi 2*sin(3x) yang
+memiliki amplitudo dua kali lebih tinggi (bernilai antara -2 sampai 2) dan frekuensi
+tiga kali lebih rapat sehingga terbentuk 3 gelombang penuh (periode 2*pi/3).
+
+
+## 4. Materi Geometri Analitik / Fungsi Implisit (Irisan Kerucut: Elips dan Hiperbola)
+
+Soal 4: Gambarkan kurva implisit dari persamaan elips dan hiperbola berikut pada
+bidang koordinat yang sama dengan rasio aspek persegi (square):
+
+
+\>reset;
+
+\>plot2d("x^2/9 + y^2/4 - 1", r=4, level=0, contourcolor=blue, contourwidth=2, \>square, grid=6, ...  
+\>     xl="x", yl="y", title="Kurva Implisit Elips dan Hiperbola"); ...  
+\>   plot2d("x^2 - y^2 - 1", level=0, contourcolor=red, contourwidth=2, \>add):
+
+
+![images/TugasAplikom4Adi25030630001-168.png](images/TugasAplikom4Adi25030630001-168.png)
+
+Penjelasan hasil output:
+Dengan menggunakan parameter level=0 pada fungsi implisit, EMT menggambar dua kurva
+irisan kerucut secara akurat. Kurva biru membentuk elips horizontal yang berpusat di (0,0)
+dengan sumbu semi-mayor 3 (memotong sumbu-x di -3 dan 3) dan sumbu semi-minor 2
+(memotong sumbu-y di -2 dan 2). Kurva merah membentuk hiperbola terbuka ke kiri dan kanan
+dengan titik puncak di (-1, 0) dan (1, 0) yang memotong elips di empat titik simetris.
+
+
+\>  
+
+
+# Rujukan Lengkap Fungsi plot2d()
+
+  function plot2d (xv, yv, btest, a, b, c, d, xmin, xmax, r, n,  ..  
+  logplot, grid, frame, framecolor, square, color, thickness, style, ..  
+  auto, add, user, delta, points, addpoints, pointstyle, bar, histogram,  ..  
+  distribution, even, steps, own, adaptive, hue, level, contour,  ..  
+  nc, filled, fillcolor, outline, title, xl, yl, maps, contourcolor, ..  
+  contourwidth, ticks, margin, clipping, cx, cy, insimg, spectral,  ..  
+  cgrid, vertical, smaller, dl, niveau, levels)  
+
+Multipurpose plot function for plots in the plane (2D plots). This function can do
+plots of functions of one variables, data plots, curves in the plane, bar plots, grids
+of complex numbers, and implicit plots of functions of two variables.
+
+
+Parameters
+
+
+
+
+x,y       : equations, functions or data vectors
+
+
+a,b,c,d   : Plot area (default a=-2,b=2)
+
+
+r         : if r is set, then a=cx-r, b=cx+r, c=cy-r, d=cy+r
+
+
+            r can be a vector [rx,ry] or a vector [rx1,rx2,ry1,ry2].
+
+
+xmin,xmax : range of the parameter for curves
+
+
+auto      : Determine y-range automatically (default)
+
+
+square    : if true, try to keep square x-y-ranges
+
+
+n         : number of intervals (default is adaptive)
+
+
+grid      : 0 = no grid and labels,
+
+
+            1 = axis only,
+
+
+            2 = normal grid (see below for the number of grid lines)
+
+
+            3 = inside axis
+
+
+            4 = no grid
+
+
+            5 = full grid including margin
+
+
+            6 = ticks at the frame
+
+
+            7 = axis only
+
+
+            8 = axis only, sub-ticks
+
+
+frame     : 0 = no frame
+
+
+framecolor: color of the frame and the grid
+
+
+margin    : number between 0 and 0.4 for the margin around the plot
+
+
+color     : Color of curves. If this is a vector of colors,
+
+
+            it will be used for each row of a matrix of plots. In the case of
+
+
+            point plots, it should be a column vector. If a row vector or a
+
+
+            full matrix of colors is used for point plots, it will be used for
+
+
+            each data point.
+
+
+thickness : line thickness for curves
+
+
+            This value can be smaller than 1 for very thin lines.
+
+
+style     : Plot style for lines, markers, and fills.
+
+
+            For points use
+
+
+            "[]", "&lt;&gt;", ".", "..", "...",
+
+
+            "*", "+", "|", "-", "o"
+
+
+            "[]#", "&lt;&gt;#", "o#" (filled shapes)
+
+
+            "[]w", "&lt;&gt;w", "ow" (non-transparent)
+
+
+            For lines use
+
+
+            "-", "--", "-.", ".", ".-.", "-.-", "-&gt;"
+
+
+            For filled polygons or bar plots use
+
+
+            "#", "#O", "O", "/", "\", "\/",
+
+
+            "+", "|", "-", "t"
+
+
+points    : plot single points instead of line segments
+
+
+addpoints : if true, plots line segments and points
+
+
+add       : add the plot to the existing plot
+
+
+user      : enable user interaction for functions
+
+
+delta     : step size for user interaction
+
+
+bar       : bar plot (x are the interval bounds, y the interval values)
+
+
+histogram : plots the frequencies of x in n subintervals
+
+
+distribution=n : plots the distribution of x with n subintervals
+
+
+even      : use inter values for automatic histograms.
+
+
+steps     : plots the function as a step function (steps=1,2)
+
+
+adaptive  : use adaptive plots (n is the minimal number of steps)
+
+
+level     : plot level lines of an implicit function of two variables
+
+
+outline   : draws boundary of level ranges.
+
+
+
+
+If the level value is a 2xn matrix, ranges of levels will be drawn
+
+
+in the color using the given fill style. If outline is true, it
+
+
+will be drawn in the contour color. Using this feature, regions of
+
+
+f(x,y) between limits can be marked.
+
+
+
+
+hue       : add hue color to the level plot to indicate the function
+
+
+            value
+
+
+contour   : Use level plot with automatic levels
+
+
+nc        : number of automatic level lines
+
+
+title     : plot title (default "")
+
+
+xl, yl    : labels for the x- and y-axis
+
+
+smaller   : if &gt;0, there will be more space to the left for labels.
+
+
+vertical  :
+
+
+  Turns vertical labels on or off. This changes the global variable
+
+
+  verticallabels locally for one plot. The value 1 sets only vertical
+
+
+  text, the value 2 uses vertical numerical labels on the y axis.
+
+
+filled    : fill the plot of a curve
+
+
+fillcolor : fill color for bar and filled curves
+
+
+outline   : boundary for filled polygons
+
+
+logplot   : set logarithmic plots
+
+
+            1 = logplot in y,
+
+
+            2 = logplot in xy,
+
+
+            3 = logplot in x
+
+
+own       :
+
+
+  A string, which points to an own plot routine. With &gt;user, you get
+
+
+  the same user interaction as in plot2d. The range will be set
+
+
+  before each call to your function.
+
+
+maps      : map expressions (0 is faster), functions are always mapped.
+
+
+contourcolor : color of contour lines
+
+
+contourwidth : width of contour lines
+
+
+clipping  : toggles the clipping (default is true)
+
+
+title     :
+
+
+  This can be used to describe the plot. The title will appear above
+
+
+  the plot. Moreover, a label for the x and y axis can be added with
+
+
+  xl="string" or yl="string". Other labels can be added with the
+
+
+  functions label() or labelbox(). The title can be a unicode
+
+
+  string or an image of a Latex formula.
+
+
+cgrid     :
+
+
+  Determines the number of grid lines for plots of complex grids.
+
+
+  Should be a divisor of the the matrix size minus 1 (number of
+
+
+  subintervals). cgrid can be a vector [cx,cy].
+
+
+Overview
+
+
+The function can plot
+
+
+* 
+expressions, call collections or functions of one variable,
+
+* 
+parametric curves,
+
+* 
+x data against y data,
+
+* 
+implicit functions,
+
+* 
+bar plots,
+
+* 
+complex grids,
+
+* 
+polygons.
+
+
+If a function or expression for xv is given, plot2d() will compute
+
+
+values in the given range using the function or expression. The
+
+
+expression must be an expression in the variable x. The range must
+
+
+be defined in the parameters a and b unless the default range
+
+
+[-2,2] should be used. The y-range will be computed automatically,
+
+
+unless c and d are specified, or a radius r, which yields the range
+
+
+[-r,r] for x and y. For plots of functions, plot2d will use an
+
+
+adaptive evaluation of the function by default. To speed up the
+
+
+plot for complicated functions, switch this off with &lt;adaptive, and
+
+
+optionally decrease the number of intervals n. Moreover, plot2d()
+
+
+will by default use mapping. I.e., it will compute the plot element
+
+
+for element. If your expression or your functions can handle a
+
+
+vector x, you can switch that off with &lt;maps for faster evaluation.
+
+
+Note that adaptive plots are always computed element for element. 
+
+
+If functions or expressions for both xv and for yv are specified,
+
+
+plot2d() will compute a curve with the xv values as x-coordinates
+
+
+and the yv values as y-coordinates. In this case, a range should be
+
+
+defined for the parameter using xmin, xmax. Expressions contained
+
+
+in strings must always be expressions in the parameter variable x.
+
+
