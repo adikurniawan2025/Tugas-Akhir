@@ -1,0 +1,4394 @@
+﻿# EMT untuk Statistika
+Di dalam notebook ini, kami mendemonstrasikan plot, uji, dan
+distribusi statistik utama di Euler.
+
+
+Mari kita mulai dengan beberapa statistik deskriptif. Ini bukanlah
+pengantar statistika, sehingga Anda mungkin memerlukan sedikit latar
+belakang pengetahuan untuk memahami detailnya.
+
+
+Misalkan terdapat data pengukuran berikut. Kita ingin menghitung nilai
+rata-rata (mean) dan simpangan baku terukur (measured standard
+deviation).
+
+
+\>M=[1000,1004,998,997,1002,1001,998,1004,998,997]; ...  
+\>   median(M), mean(M), dev(M),
+
+
+    999
+    999.9
+    2.72641400622
+
+Kita dapat membuat diagram kotak-garis (box-and-whiskers plot) untuk
+data tersebut. Dalam kasus kita, tidak terdapat pencilan (outliers).
+
+
+\>aspect(1.75); boxplot(M):
+
+
+![images/TugasAplikom8Adi25030630001-001.png](images/TugasAplikom8Adi25030630001-001.png)
+
+Kita menghitung probabilitas suatu nilai lebih besar dari 1005, dengan
+mengasumsikan nilai yang diukur berasal dari distribusi normal.
+
+
+Semua fungsi untuk distribusi di Euler berakhiran ...dis dan
+menghitung fungsi distribusi probabilitas kumulatif (cumulative
+probability distribution / CPF).
+
+
+$$\text{normaldis(x,m,d)}=\int_{-\infty}^x \frac{1}{d\sqrt{2\pi}}e^{-\frac{1}{2}(\frac{t-m}{d})^2}\ dt.$$Kita mencetak hasilnya dalam % dengan akurasi 2 digit menggunakan
+fungsi print.
+
+
+\>print((1-normaldis(1005,mean(M),dev(M)))\*100,2,unit=" %")
+
+
+          3.07 %
+
+Untuk contoh berikutnya, kita mengasumsikan jumlah pria berikut pada
+rentang ukuran yang diberikan.
+
+
+\>r=155.5:4:187.5; v=[22,71,136,169,139,71,32,8];
+
+
+Berikut adalah plot dari distribusi tersebut.
+
+
+\>plot2d(r,v,a=150,b=200,c=0,d=190,bar=1,style="\\/"):
+
+
+![images/TugasAplikom8Adi25030630001-003.png](images/TugasAplikom8Adi25030630001-003.png)
+
+Kita dapat memasukkan data mentah tersebut ke dalam sebuah tabel.
+
+
+Tabel adalah metode untuk menyimpan data statistik. Tabel kita harus
+memuat tiga kolom: awal rentang, akhir rentang, dan jumlah pria dalam
+rentang tersebut.
+
+
+Tabel dapat dicetak dengan menyertakan tajuk kolom (*headers*). Kita
+menggunakan vektor string untuk mengatur tajuk-tajuk tersebut.
+
+
+\>T:=r[1:8]' | r[2:9]' | v'; writetable(T,labc=["BB","BA","Frek"])
+
+
+            BB        BA      Frek
+         155.5     159.5        22
+         159.5     163.5        71
+         163.5     167.5       136
+         167.5     171.5       169
+         171.5     175.5       139
+         175.5     179.5        71
+         179.5     183.5        32
+         183.5     187.5         8
+
+Jika kita memerlukan nilai rata-rata dan statistik ukuran lainnya,
+kita perlu menghitung titik tengah dari rentang tersebut. Kita dapat
+menggunakan dua kolom pertama dari tabel kita untuk hal ini.
+
+
+Simbol "|" digunakan untuk memisahkan kolom, fungsi "writetable"
+digunakan untuk menulis tabel, dengan opsi "labc" untuk menentukan
+tajuk kolom.
+
+
+\>(T[,1]+T[,2])/2 // the midpoint of each interval
+
+
+            157.5 
+            161.5 
+            165.5 
+            169.5 
+            173.5 
+            177.5 
+            181.5 
+            185.5 
+
+Namun, lebih mudah untuk melipat rentang tersebut dengan vektor
+[1/2,1/2].
+
+
+\>M=fold(r,[0.5,0.5])
+
+
+    [157.5,  161.5,  165.5,  169.5,  173.5,  177.5,  181.5,  185.5]
+
+Sekarang kita dapat menghitung rata-rata dan simpangan dari sampel
+dengan frekuensi yang diberikan.
+
+
+\>{m,d}=meandev(M,v); m, d,
+
+
+    169.901234568
+    5.98912964449
+
+Mari kita tambahkan distribusi normal dari nilai-nilai tersebut ke
+diagram batang di atas. Rumus untuk distribusi normal dengan rata-rata
+$m$ dan simpangan baku $d$ adalah:
+
+
+$$y=\frac{1}{d\sqrt{2\pi}}e^{\frac{-(x-m)^2}{2d^2}}.$$Karena nilainya berada di antara 0 dan 1, untuk memplotnya pada
+diagram batang, nilai tersebut harus dikalikan dengan 4 kali jumlah
+total data.
+
+
+\> plot2d("qnormal(x,m,d)\*sum(v)\*4", ...  
+\>     xmin=min(r),xmax=max(r),thickness=3,add=1):
+
+
+![images/TugasAplikom8Adi25030630001-005.png](images/TugasAplikom8Adi25030630001-005.png)
+
+# Tables
+
+Di direktori notebook ini, Anda akan menemukan sebuah file yang berisi
+tabel. Data tersebut merepresentasikan hasil dari sebuah survei.
+Berikut adalah empat baris pertama dari file tersebut. Data tersebut
+berasal dari buku online berbahasa Jerman berjudul "Einführung in die
+Statistik mit R" karya A. Handl.
+
+
+\>printfile("table.dat",4);
+
+
+    Person Sex Age Titanic Evaluation Tip Problem
+    1 m 30 n . 1.80 n
+    2 f 23 y g 1.80 n
+    3 f 26 y g 1.80 y
+
+Tabel tersebut berisi 7 kolom angka atau token (*string*). Kita ingin
+membaca tabel dari file tersebut. Pertama, kita menggunakan terjemahan
+kita sendiri untuk token-token tersebut.
+
+
+Untuk itu, kita mendefinisikan himpunan token. Fungsi `strtokens()`
+mengambil vektor *string* yang berisi token dari *string* yang
+diberikan.
+
+
+\>mf:=["m","f"]; yn:=["y","n"]; ev:=strtokens("g vg m b vb");
+
+
+Sekarang kita membaca tabel dengan terjemahan tersebut.
+
+
+Argumen `tok2`, `tok4` dan seterusnya adalah terjemahan untuk
+kolom-kolom pada tabel. Argumen-argumen ini tidak ada di dalam daftar
+parameter `readtable()`, sehingga Anda perlu menyediakannya
+menggunakan tanda `:=`.
+
+
+\>{MT,hd}=readtable("table.dat",tok2:=mf,tok4:=yn,tok5:=ev,tok7:=yn);
+
+\>load over statistics;
+
+
+Untuk pencetakan, kita perlu menentukan himpunan token yang sama. Kita
+hanya mencetak empat baris pertama.
+
+
+\>writetable(MT[1:10],labc=hd,wc=5,tok2:=mf,tok4:=yn,tok5:=ev,tok7:=yn);
+
+
+     Person  Sex  Age Titanic Evaluation  Tip Problem
+          1    m   30       n          .  1.8       n
+          2    f   23       y          g  1.8       n
+          3    f   26       y          g  1.8       y
+          4    m   33       n          .  2.8       n
+          5    m   37       n          .  1.8       n
+          6    m   28       y          g  2.8       y
+          7    f   31       y         vg  2.8       n
+          8    m   23       n          .  0.8       n
+          9    f   24       y         vg  1.8       y
+         10    m   26       n          .  1.8       n
+
+Titik-titik "." merepresentasikan nilai yang tidak tersedia.
+
+
+Jika kita tidak ingin menentukan token untuk terjemahan terlebih
+dahulu, kita hanya perlu menentukan kolom mana yang berisi token dan
+bukan angka.
+
+
+\>ctok=[2,4,5,7]; {MT,hd,tok}=readtable("table.dat",ctok=ctok);
+
+
+Fungsi `readtable()` sekarang mengembalikan sekumpulan token.
+
+
+\>tok
+
+
+    m
+    n
+    f
+    y
+    g
+    vg
+
+Tabel tersebut berisi entri-entri dari file dengan token yang telah
+diterjemahkan menjadi angka.
+
+
+*String* khusus `NA="."` diinterpretasikan sebagai "Not Available",
+dan menghasilkan nilai `NAN` (*not a number*) di dalam tabel.
+Terjemahan ini dapat diubah menggunakan parameter `NA` dan `NAval`.
+
+
+\>MT[1]
+
+
+    [1,  1,  30,  2,  NAN,  1.8,  2]
+
+Berikut adalah isi tabel dengan angka yang tidak diterjemahkan.
+
+
+\>writetable(MT,wc=5)
+
+
+        1    1   30    2    .  1.8    2
+        2    3   23    4    5  1.8    2
+        3    3   26    4    5  1.8    4
+        4    1   33    2    .  2.8    2
+        5    1   37    2    .  1.8    2
+        6    1   28    4    5  2.8    4
+        7    3   31    4    6  2.8    2
+        8    1   23    2    .  0.8    2
+        9    3   24    4    6  1.8    4
+       10    1   26    2    .  1.8    2
+       11    3   23    4    6  1.8    4
+       12    1   32    4    5  1.8    2
+       13    1   29    4    6  1.8    4
+       14    3   25    4    5  1.8    4
+       15    3   31    4    5  0.8    2
+       16    1   26    4    5  2.8    2
+       17    1   37    2    .  3.8    2
+       18    1   38    4    5    .    2
+       19    3   29    2    .  3.8    2
+       20    3   28    4    6  1.8    2
+       21    3   28    4    1  2.8    4
+       22    3   28    4    6  1.8    4
+       23    3   38    4    5  2.8    2
+       24    3   27    4    1  1.8    4
+       25    1   27    2    .  2.8    4
+
+Demi kepraktisan, Anda dapat memasukkan keluaran dari readtable() ke
+dalam sebuah list.
+
+
+\>Table={{readtable("table.dat",ctok=ctok)}};
+
+
+Dengan menggunakan kolom token yang sama dan token yang dibaca dari
+file, kita dapat mencetak tabel tersebut. Kita bisa menentukan ctok,
+tok, dan sebagainya, atau menggunakan list Table.
+
+
+\>writetable(Table,ctok=ctok,wc=5);
+
+
+     Person  Sex  Age Titanic Evaluation  Tip Problem
+          1    m   30       n          .  1.8       n
+          2    f   23       y          g  1.8       n
+          3    f   26       y          g  1.8       y
+          4    m   33       n          .  2.8       n
+          5    m   37       n          .  1.8       n
+          6    m   28       y          g  2.8       y
+          7    f   31       y         vg  2.8       n
+          8    m   23       n          .  0.8       n
+          9    f   24       y         vg  1.8       y
+         10    m   26       n          .  1.8       n
+         11    f   23       y         vg  1.8       y
+         12    m   32       y          g  1.8       n
+         13    m   29       y         vg  1.8       y
+         14    f   25       y          g  1.8       y
+         15    f   31       y          g  0.8       n
+         16    m   26       y          g  2.8       n
+         17    m   37       n          .  3.8       n
+         18    m   38       y          g    .       n
+         19    f   29       n          .  3.8       n
+         20    f   28       y         vg  1.8       n
+         21    f   28       y          m  2.8       y
+         22    f   28       y         vg  1.8       y
+         23    f   38       y          g  2.8       n
+         24    f   27       y          m  1.8       y
+         25    m   27       n          .  2.8       y
+
+Fungsi tablecol() mengembalikan nilai-nilai dari kolom tabel, dengan
+melewatkan baris apa pun yang memiliki nilai NAN ("." di dalam file),
+serta indeks dari kolom-kolom yang memuat nilai-nilai tersebut.
+
+
+\>{c,i}=tablecol(MT,[5,6]);
+
+
+Kita dapat menggunakan ini untuk mengekstrak kolom dari tabel guna
+membuat tabel baru.
+
+
+\>j=[1,5,6]; writetable(MT[i,j],labc=hd[j],ctok=[2],tok=tok)
+
+
+        Person Evaluation       Tip
+             2          g       1.8
+             3          g       1.8
+             6          g       2.8
+             7         vg       2.8
+             9         vg       1.8
+            11         vg       1.8
+            12          g       1.8
+            13         vg       1.8
+            14          g       1.8
+            15          g       0.8
+            16          g       2.8
+            20         vg       1.8
+            21          m       2.8
+            22         vg       1.8
+            23          g       2.8
+            24          m       1.8
+
+Tentu saja, dalam kasus ini kita perlu mengekstrak tabel itu sendiri
+dari list Table.
+
+
+\>MT=Table[1];
+
+
+Tentu saja, kita juga dapat menggunakannya untuk menentukan nilai
+rata-rata dari suatu kolom atau nilai statistik lainnya.
+
+
+\>mean(tablecol(MT,6))
+
+
+    2.175
+
+Fungsi getstatistics() mengembalikan elemen-elemen dalam sebuah vektor
+beserta jumlah kemunculannya. Kita menerapkannya pada nilai "m" dan
+"f" di kolom kedua pada tabel kita.
+
+
+\>{xu,count}=getstatistics(tablecol(MT,2)); xu, count,
+
+
+    [1,  3]
+    [12,  13]
+
+Kita dapat mencetak hasilnya ke dalam sebuah tabel baru.
+
+
+\>writetable(count',labr=tok[xu])
+
+
+             m        12
+             f        13
+
+Fungsi selecttable() mengembalikan tabel baru dengan nilai-nilai pada
+satu kolom yang dipilih dari sebuah vektor indeks. Pertama, kita
+mencari indeks dari dua nilai kita di dalam tabel token.
+
+
+\>v:=indexof(tok,["g","vg"])
+
+
+    [5,  6]
+
+Sekarang kita dapat memilih baris-baris tabel yang memiliki salah satu
+nilai di dalam v pada baris ke-5 mereka.
+
+
+\>MT1:=MT[selectrows(MT,5,v)]; i:=sortedrows(MT1,5);
+
+
+Sekarang kita dapat mencetak tabel tersebut, dengan nilai-nilai yang
+telah diekstrak dan diurutkan pada kolom ke-5.
+
+
+\>writetable(MT1[i],labc=hd,ctok=ctok,tok=tok,wc=7);
+
+
+     Person    Sex    Age Titanic Evaluation    Tip Problem
+          2      f     23       y          g    1.8       n
+          3      f     26       y          g    1.8       y
+          6      m     28       y          g    2.8       y
+         18      m     38       y          g      .       n
+         16      m     26       y          g    2.8       n
+         15      f     31       y          g    0.8       n
+         12      m     32       y          g    1.8       n
+         23      f     38       y          g    2.8       n
+         14      f     25       y          g    1.8       y
+          9      f     24       y         vg    1.8       y
+          7      f     31       y         vg    2.8       n
+         20      f     28       y         vg    1.8       n
+         22      f     28       y         vg    1.8       y
+         13      m     29       y         vg    1.8       y
+         11      f     23       y         vg    1.8       y
+
+Untuk statistik berikutnya, kita ingin menghubungkan dua kolom dari
+tabel tersebut. Jadi, kita mengekstrak kolom 2 dan 4 lalu mengurutkan
+tabelnya.
+
+
+\>i=sortedrows(MT,[2,4]);  ...  
+\>     writetable(tablecol(MT[i],[2,4])',ctok=[1,2],tok=tok)
+
+
+             m         n
+             m         n
+             m         n
+             m         n
+             m         n
+             m         n
+             m         n
+             m         y
+             m         y
+             m         y
+             m         y
+             m         y
+             f         n
+             f         y
+             f         y
+             f         y
+             f         y
+             f         y
+             f         y
+             f         y
+             f         y
+             f         y
+             f         y
+             f         y
+             f         y
+
+Dengan getstatistics(), kita juga dapat menghubungkan jumlah
+kemunculan pada dua kolom tabel satu sama lain.
+
+
+\>MT24=tablecol(MT,[2,4]); ...  
+\>   {xu1,xu2,count}=getstatistics(MT24[1],MT24[2]); ...  
+\>   writetable(count,labr=tok[xu1],labc=tok[xu2])
+
+
+                       n         y
+             m         7         5
+             f         1        12
+
+Sebuah tabel dapat ditulis ke dalam sebuah file.
+
+
+\>filename="test.dat"; ...  
+\>   writetable(count,labr=tok[xu1],labc=tok[xu2],file=filename);
+
+
+Kemudian kita dapat membaca tabel tersebut dari file.
+
+
+\>{MT2,hd,tok2,hdr}=readtable(filename,\>clabs,\>rlabs); ...  
+\>   writetable(MT2,labr=hdr,labc=hd)
+
+
+                       n         y
+             m         7         5
+             f         1        12
+
+Dan menghapus file tersebut.
+
+
+\>fileremove(filename);
+
+
+# Distributions
+
+Dengan plot2d, ada cara yang sangat mudah untuk memplot distribusi
+data eksperimen.
+
+
+\>p=normal(1,1000); //1000 random normal-distributed sample p
+
+\>plot2d(p,distribution=20,style="\\/"); // plot the random sample p
+
+\>plot2d("qnormal(x,0,1)",add=1): // add the standard normal distribution plot
+
+
+![images/TugasAplikom8Adi25030630001-006.png](images/TugasAplikom8Adi25030630001-006.png)
+
+Harap perhatikan perbedaan antara plot batang (sampel) dan kurva
+normal (distribusi sebenarnya). Masukkan kembali ketiga perintah
+tersebut untuk melihat hasil sampling lainnya.
+
+
+Berikut adalah perbandingan dari 10 simulasi yang masing-masing
+terdiri dari 1000 nilai berdistribusi normal menggunakan yang disebut
+*box plot* (diagram kotak garis). Plot ini menunjukkan median, kuartil
+25% dan 75%, nilai minimum dan maksimum, serta pencilan (*outlier*).
+
+
+\>p=normal(10,1000); boxplot(p):
+
+
+![images/TugasAplikom8Adi25030630001-007.png](images/TugasAplikom8Adi25030630001-007.png)
+
+Untuk menghasilkan bilangan bulat acak, Euler memiliki `intrandom`.
+Mari kita simulasikan lemparan dadu dan plot distribusinya.
+
+
+Kita menggunakan fungsi `getmultiplicities(v,x)`, yang menghitung
+seberapa sering elemen-elemen pada `v` muncul di dalam `x`. Kemudian
+kita memplot hasilnya menggunakan `columnsplot()`.
+
+
+\>k=intrandom(1,6000,6);  ...  
+\>   columnsplot(getmultiplicities(1:6,k));  ...  
+\>   ygrid(1000,color=red):
+
+
+![images/TugasAplikom8Adi25030630001-008.png](images/TugasAplikom8Adi25030630001-008.png)
+
+Meskipun `intrandom(n,m,k)` menghasilkan bilangan bulat terdistribusi
+seragam dari 1 sampai `k`, kita tetap bisa menggunakan distribusi
+bilangan bulat lainnya dengan `randpint()`.
+
+
+Pada contoh berikut, probabilitas untuk 1, 2, dan 3 masing-masing
+adalah 0,4, 0,1, dan 0,5.
+
+
+\>randpint(1,1000,[0.4,0.1,0.5]); getmultiplicities(1:3,%)
+
+
+    [394,  107,  499]
+
+Euler dapat menghasilkan nilai acak dari lebih banyak distribusi.
+Silakan lihat ke dalam referensi.
+
+
+Sebagai contoh, kita mencoba distribusi eksponensial. Suatu peubah
+acak kontinu $X$ dikatakan memiliki distribusi eksponensial jika
+fungsi kepekatan peluangnya (PDF) diberikan oleh
+
+
+$$f_X(x)=\lambda e^{-\lambda x},\quad x>0,\quad \lambda>0,$$
+
+dengan parameter
+
+
+$$\lambda=\frac{1}{\mu},\quad \mu \text{ is the mean, and denoted by } X \sim \text{Exponential}(\lambda).$$\>plot2d(randexponential(1,1000,2),\>distribution):
+
+
+![images/TugasAplikom8Adi25030630001-011.png](images/TugasAplikom8Adi25030630001-011.png)
+
+Untuk banyak distribusi, Euler dapat menghitung fungsi distribusi dan
+inversnya.
+
+
+\>plot2d("normaldis",-4,4): 
+
+
+![images/TugasAplikom8Adi25030630001-012.png](images/TugasAplikom8Adi25030630001-012.png)
+
+Berikut ini adalah salah satu cara untuk memplot kuantil.
+
+
+\>plot2d("qnormal(x,1,1.5)",-4,6);  ...  
+\>   plot2d("qnormal(x,1,1.5)",a=2,b=5,\>add,\>filled):
+
+
+![images/TugasAplikom8Adi25030630001-013.png](images/TugasAplikom8Adi25030630001-013.png)
+
+$$\text{normaldis(x,m,d)}=\int_{-\infty}^x \frac{1}{d\sqrt{2\pi}}e^{-\frac{1}{2}(\frac{t-m}{d})^2}\ dt.$$
+
+Probabilitas berada di area hijau adalah sebagai berikut.
+
+
+\>normaldis(5,1,1.5)-normaldis(2,1,1.5)
+
+
+    0.248662156979
+
+Hal ini dapat dihitung secara numerik dengan integral berikut.
+
+
+$$\int_2^5 \frac{1}{1.5\sqrt{2\pi}}e^{-\frac{1}{2}(\frac{x-1}{1.5})^2}\ dx.$$\>gauss("qnormal(x,1,1.5)",2,5)
+
+
+    0.248662156979
+
+Mari kita bandingkan distribusi binomial dengan distribusi normal yang
+memiliki rataan (mean) dan simpangan baku yang sama. Fungsi
+invbindis() menyelesaikan interpolasi linear di antara nilai-nilai
+bilangan bulat.
+
+
+\>invbindis(0.95,1000,0.5), invnormaldis(0.95,500,0.5\*sqrt(1000))
+
+
+    525.516721219
+    526.007419394
+
+Fungsi qdis() adalah fungsi kepekatan (densitas) dari distribusi
+khi-kuadrat (chi-square). Seperti biasa, Euler memetakan vektor ke
+fungsi ini. Dengan demikian, kita memperoleh plot dari semua
+distribusi khi-kuadrat dengan derajat kebebasan 5 sampai 30 secara
+mudah dengan cara berikut.
+
+
+\>plot2d("qchidis(x,(5:5:50)')",0,50):
+
+
+![images/TugasAplikom8Adi25030630001-016.png](images/TugasAplikom8Adi25030630001-016.png)
+
+Euler memiliki fungsi-fungsi yang akurat untuk mengevaluasi
+distribusi. Mari kita periksa chidis() dengan sebuah integral.
+
+
+Penamaannya diupayakan agar konsisten. Misalnya:
+
+
+* 
+distribusi khi-kuadrat (chi-square) adalah chidis(),
+
+* 
+ungsi inversnya adalah invchidis(),
+
+* 
+fungsi kepekatannya (densitas) adalah qchidis().
+
+
+Komplemen dari distribusi tersebut (ekor atas / upper tail) adalah
+chicdis().
+
+
+\>chidis(1.5,2), integrate("qchidis(x,2)",0,1.5)
+
+
+    0.527633447259
+    0.527633447259
+
+# Discrete Distributions
+
+Untuk mendefinisikan distribusi diskret Anda sendiri, Anda dapat
+menggunakan metode berikut.
+
+
+Pertama, kita menetapkan fungsi distribusinya.
+
+
+\>wd = 0|((1:6)+[-0.01,0.01,0,0,0,0])/6
+
+
+    [0,  0.165,  0.335,  0.5,  0.666667,  0.833333,  1]
+
+Artinya adalah bahwa dengan probabilitas wd[i+1]-wd[i], kita
+menghasilkan nilai acak i.
+
+
+Hal ini hampir menyerupai distribusi seragam (uniform distribution).
+Mari kita definisikan pembangkit bilangan acak untuk ini. Fungsi
+find(v,x) mencari nilai x di dalam vektor v. Fungsi ini juga berlaku
+untuk vektor x.
+
+
+\>function wrongdice (n,m) := find(wd,random(n,m))
+
+
+Galatnya sangat halus sehingga kita baru melihatnya dengan iterasi
+yang sangat banyak.
+
+
+\>columnsplot(getmultiplicities(1:6,wrongdice(1,1000000))):
+
+
+![images/TugasAplikom8Adi25030630001-017.png](images/TugasAplikom8Adi25030630001-017.png)
+
+Berikut adalah fungsi sederhana untuk memeriksa distribusi seragam
+dari nilai-nilai 1...K di dalam v. Kita menerima hasilnya jika untuk
+semua frekuensi
+
+
+$$\left|f_i-\frac{1}{K}\right| < \frac{\delta}{\sqrt{n}}.$$\>function checkrandom (v, delta=1) ...
+
+
+      K=max(v); n=cols(v);
+      fr=getfrequencies(v,1:K);
+      return max(fr/n-1/K)<delta/sqrt(n);
+      endfunction
+</pre>
+Memang benar bahwa fungsi tersebut menolak distribusi seragam.
+
+
+\>checkrandom(wrongdice(1,1000000))
+
+
+    0
+
+Dan fungsi tersebut menerima pembangkit bilangan acak bawaan.
+
+
+\>checkrandom(intrandom(1,1000000,6))
+
+
+    1
+
+Kita dapat menghitung distribusi binomial. Pertama, terdapat fungsi
+binomialsum(), yang mengembalikan probabilitas dari i atau kurang
+keberhasilan dari n percobaan.
+
+
+\>bindis(410,1000,0.4)
+
+
+    0.751401349654
+
+Fungsi invers Beta digunakan untuk menghitung selang kepercayaan
+Clopper-Pearson bagi parameter p. Tingkat signifikansi (atau taraf)
+bawaannya adalah alpha.
+
+
+Makna dari selang ini adalah jika p berada di luar selang tersebut,
+maka hasil yang teramati sebesar 410 dari 1000 merupakan kejadian yang
+jarang.
+
+
+\>clopperpearson(410,1000)
+
+
+    [0.37932,  0.441212]
+
+Perintah-perintah berikut merupakan cara langsung untuk memperoleh
+hasil di atas. Namun, untuk n yang besar, penjumlahan langsung tidak
+akurat dan lambat.
+
+
+\>p=0.4; i=0:410; n=1000; sum(bin(n,i)\*p^i\*(1-p)^(n-i))
+
+
+    0.751401349655
+
+Omong-omong, invbinsum() menghitung invers dari binomialsum().
+
+
+\>invbindis(0.75,1000,0.4)
+
+
+    409.932733047
+
+Dalam permainan Bridge, kita mengasumsikan terdapat 5 kartu yang
+tersisa (dari total 52 kartu) di dua tangan pemain (26 kartu). Mari
+kita hitung probabilitas terjadinya distribusi yang lebih buruk
+daripada 3:2 (misalnya 0:5, 1:4, 4:1, atau 5:0).
+
+
+\>2\*hypergeomsum(1,5,13,26)
+
+
+    0.321739130435
+
+Terdapat juga simulasi untuk distribusi multinomial.
+
+
+\>randmultinomial(10,1000,[0.4,0.1,0.5])
+
+
+              394            82           524 
+              418            92           490 
+              445            90           465 
+              403           114           483 
+              405            95           500 
+              384           107           509 
+              414            93           493 
+              419            90           491 
+              394           101           505 
+              382           103           515 
+
+# Plotting Data
+
+Untuk memplot data, kita mencoba menggunakan hasil pemilu Jerman sejak
+tahun 1990, yang diukur dalam jumlah kursi.
+
+
+\>BW := [ ...  
+\>   1990,662,319,239,79,8,17; ...  
+\>   1994,672,294,252,47,49,30; ...  
+\>   1998,669,245,298,43,47,36; ...  
+\>   2002,603,248,251,47,55,2; ...  
+\>   2005,614,226,222,61,51,54; ...  
+\>   2009,622,239,146,93,68,76; ...  
+\>   2013,631,311,193,0,63,64];
+
+
+Untuk nama-nama partai, kita menggunakan sebuah string nama.
+
+
+\>P:=["CDU/CSU","SPD","FDP","Gr","Li"];
+
+
+Mari kita cetak persentasenya dengan rapi.
+
+
+Pertama, kita mengekstrak kolom-kolom yang diperlukan. Kolom 3 hingga
+7 adalah perolehan kursi masing-masing partai, dan kolom 2 adalah
+jumlah total kursi. Kolom 1 merupakan tahun pemilu.
+
+
+\>BT:=BW[,3:7]; BT:=BT/sum(BT); YT:=BW[,1]';
+
+
+Kemudian kita mencetak statistik tersebut dalam bentuk tabel. Kita
+menggunakan nama-nama (partai) sebagai tajuk kolom, dan tahun-tahun
+sebagai tajuk baris. Lebar bawaan untuk kolom adalah wc=10, namun kita
+lebih memilih keluaran yang lebih rapat. Kolom-kolom tersebut akan
+diperlebar untuk menyesuaikan label kolom jika diperlukan.
+
+
+\>writetable(BT\*100,wc=6,dc=0,\>fixed,labc=P,labr=YT)
+
+
+           CDU/CSU   SPD   FDP    Gr    Li
+      1990      48    36    12     1     3
+      1994      44    38     7     7     4
+      1998      37    45     6     7     5
+      2002      41    42     8     9     0
+      2005      37    36    10     8     9
+      2009      38    23    15    11    12
+      2013      49    31     0    10    10
+
+Perkalian matriks berikut mengekstrak jumlah persentase dari dua
+partai besar, yang menunjukkan bahwa partai-partai kecil telah
+memperoleh pijakan/dukungan di parlemen hingga tahun 2009.
+
+
+\>BT1:=(BT.[1;1;0;0;0])'\*100
+
+
+    [84.29,  81.25,  81.1659,  82.7529,  72.9642,  61.8971,  79.8732]
+
+Terdapat juga plot statistik sederhana. Kita menggunakannya untuk
+menampilkan garis dan titik secara bersamaan. Alternatifnya adalah
+memanggil plot2d dua kali dengan argumen &gt;add.
+
+
+\>statplot(YT,BT1,"b"):
+
+
+![images/TugasAplikom8Adi25030630001-019.png](images/TugasAplikom8Adi25030630001-019.png)
+
+Definisikan beberapa warna untuk masing-masing partai.
+
+
+\>CP:=[rgb(0.5,0.5,0.5),red,yellow,green,rgb(0.8,0,0)];
+
+
+Sekarang kita dapat memplot hasil pemilu tahun 2009 dan perubahannya
+ke dalam satu plot menggunakan figure. Kita dapat menambahkan sebuah
+vektor kolom ke masing-masing plot.
+
+
+\>figure(2,1);  ...  
+\>   figure(1); columnsplot(BW[6,3:7],P,color=CP); ...  
+\>   figure(2); columnsplot(BW[6,3:7]-BW[5,3:7],P,color=CP);  ...  
+\>   figure(0):
+
+
+![images/TugasAplikom8Adi25030630001-020.png](images/TugasAplikom8Adi25030630001-020.png)
+
+Plot data menggabungkan baris-baris dari data statistik ke dalam satu
+plot.
+
+
+\>J:=BW[,1]'; DP:=BW[,3:7]'; ...  
+\>   dataplot(YT,BT',color=CP);  ...  
+\>   labelbox(P,colors=CP,styles="[]",\>points,w=0.2,x=0.3,y=0.4):
+
+
+![images/TugasAplikom8Adi25030630001-021.png](images/TugasAplikom8Adi25030630001-021.png)
+
+Plot kolom 3D menampilkan baris-baris dari data statistik dalam bentuk
+kolom. Kita menyediakan label untuk baris-baris dan kolom-kolom
+tersebut. angle adalah sudut pandang.
+
+
+\>columnsplot3d(BT,scols=P,srows=YT, ...  
+\>     angle=30°,ccols=CP):
+
+
+![images/TugasAplikom8Adi25030630001-022.png](images/TugasAplikom8Adi25030630001-022.png)
+
+Representasi lainnya adalah mosaic plot. Perlu dicatat bahwa
+kolom-kolom pada plot ini merepresentasikan kolom-kolom dari matriks.
+Karena panjangnya label CDU/CSU, kita menggunakan jendela (window)
+yang lebih kecil daripada biasanya.
+
+
+\>shrinkwindow(\>smaller);  ...  
+\>   mosaicplot(BT',srows=YT,scols=P,color=CP,style="#"); ...  
+\>   shrinkwindow():
+
+
+![images/TugasAplikom8Adi25030630001-023.png](images/TugasAplikom8Adi25030630001-023.png)
+
+Kita juga dapat membuat diagram lingkaran (pie chart). Karena warna
+hitam dan kuning membentuk sebuah koalisi, kita menyusun ulang urutan
+elemen-elemennya.
+
+
+\>i=[1,3,5,4,2]; piechart(BW[6,3:7][i],color=CP[i],lab=P[i]):
+
+
+![images/TugasAplikom8Adi25030630001-024.png](images/TugasAplikom8Adi25030630001-024.png)
+
+Berikut adalah jenis plot lainnya.
+
+
+\>starplot(normal(1,10)+4,lab=1:10,\>rays):
+
+
+![images/TugasAplikom8Adi25030630001-025.png](images/TugasAplikom8Adi25030630001-025.png)
+
+Beberapa plot pada plot2d sangat baik untuk statistika. Berikut adalah
+impulse plot dari data acak yang berdistribusi seragam pada interval
+[0,1].
+
+
+\>plot2d(makeimpulse(1:10,random(1,10)),\>bar):
+
+
+![images/TugasAplikom8Adi25030630001-026.png](images/TugasAplikom8Adi25030630001-026.png)
+
+Namun untuk data yang berdistribusi eksponensial, kita mungkin
+memerlukan plot logaritmik.
+
+
+\>logimpulseplot(1:10,-log(random(1,10))\*10):
+
+
+![images/TugasAplikom8Adi25030630001-027.png](images/TugasAplikom8Adi25030630001-027.png)
+
+Fungsi columnsplot() lebih mudah digunakan karena hanya memerlukan
+sebuah vektor nilai. Selain itu, fungsi ini dapat mengatur labelnya
+sesuai dengan yang kita inginkan; hal ini telah kita demonstrasikan
+sebelumnya dalam tutorial ini.
+
+
+Berikut adalah aplikasi lainnya, di mana kita menghitung jumlah
+karakter dalam sebuah kalimat dan memplot statistiknya.
+
+
+\>v=strtochar("the quick brown fox jumps over the lazy dog"); ...  
+\>   w=ascii("a"):ascii("z"); x=getmultiplicities(w,v); ...  
+\>   cw=[]; for k=w; cw=cw|char(k); end; ...  
+\>   columnsplot(x,lab=cw,width=0.05):
+
+
+![images/TugasAplikom8Adi25030630001-028.png](images/TugasAplikom8Adi25030630001-028.png)
+
+Kita juga dapat mengatur sumbu secara manual.
+
+
+\>n=10; p=0.4; i=0:n; x=bin(n,i)\*p^i\*(1-p)^(n-i); ...  
+\>   columnsplot(x,lab=i,width=0.05,<frame,<grid); ...  
+\>   yaxis(0,0:0.1:1,style="-\>",\>left); xaxis(0,style="."); ...  
+\>   label("p",0,0.25), label("i",11,0); ...  
+\>   textbox(["Binomial distribution","with p=0.4"]):
+
+
+![images/TugasAplikom8Adi25030630001-029.png](images/TugasAplikom8Adi25030630001-029.png)
+
+Berikut ini adalah salah satu cara untuk memplot frekuensi kemunculan
+angka-angka dalam sebuah vektor.
+
+
+Kita membuat sebuah vektor yang berisi bilangan acak bulat dari 1
+hingga 6.
+
+
+\>v:=intrandom(1,10,10)
+
+
+    [5,  1,  8,  6,  6,  10,  9,  6,  8,  3]
+
+Kemudian ekstrak bilangan-bilangan unik di dalam v.
+
+
+\>vu:=unique(v)
+
+
+    [1,  3,  5,  6,  8,  9,  10]
+
+Dan plot frekuensi tersebut ke dalam sebuah plot kolom.
+
+
+\>columnsplot(getmultiplicities(vu,v),lab=vu,style="/"):
+
+
+![images/TugasAplikom8Adi25030630001-030.png](images/TugasAplikom8Adi25030630001-030.png)
+
+Kita ingin mendemonstrasikan fungsi-fungsi untuk distribusi empiris
+dari suatu nilai.
+
+
+\>x=normal(1,20);
+
+
+Fungsi empdist(x,vs) memerlukan sebuah larik nilai yang sudah terurut.
+Oleh karena itu, kita harus mengurutkan x terlebih dahulu sebelum
+dapat menggunakannya.
+
+
+\>xs=sort(x);
+
+
+Kemudian kita memplot distribusi empiris dan beberapa batang kerapatan
+ke dalam satu plot. Alih-alih menggunakan bar plot untuk
+distribusinya, kali ini kita menggunakan sawtooth plot.
+
+
+\>figure(2,1); ...  
+\>   figure(1); plot2d("empdist",-4,4;xs); ...  
+\>   figure(2); plot2d(histo(x,v=-4:0.2:4,<bar));  ...  
+\>   figure(0):
+
+
+![images/TugasAplikom8Adi25030630001-031.png](images/TugasAplikom8Adi25030630001-031.png)
+
+Plot sebar (scatter plot) mudah dibuat di Euler menggunakan point plot
+yang biasa digunakan. Grafik berikut menunjukkan bahwa X dan X+Y jelas
+berkorelasi positif.
+
+
+\>x=normal(1,100); plot2d(x,x+rotright(x),\>points,style=".."):
+
+
+![images/TugasAplikom8Adi25030630001-032.png](images/TugasAplikom8Adi25030630001-032.png)
+
+Sering kali, kita ingin membandingkan dua sampel dari distribusi yang
+berbeda. Hal ini dapat dilakukan dengan quantile-quantile-plot.
+
+
+Untuk pengujian, kita mencoba distribusi Student-t dan distribusi
+eksponensial.
+
+
+\>x=randt(1,1000,5); y=randnormal(1,1000,mean(x),dev(x)); ...  
+\>   plot2d("x",r=6,style="--",yl="normal",xl="student-t",\>vertical); ...  
+\>   plot2d(sort(x),sort(y),\>points,color=red,style="x",\>add):
+
+
+![images/TugasAplikom8Adi25030630001-033.png](images/TugasAplikom8Adi25030630001-033.png)
+
+Plot tersebut dengan jelas menunjukkan bahwa nilai-nilai yang
+berdistribusi normal cenderung lebih kecil pada ujung-ujung
+ekstremnya.
+
+
+Jika kita memiliki dua distribusi dengan ukuran yang berbeda, kita
+dapat memperluas yang lebih kecil atau memperkecil yang lebih besar.
+Fungsi berikut sangat baik untuk keduanya. Fungsi ini mengambil
+nilai-nilai median dengan persentase antara 0 dan 1.
+
+
+\>function medianexpand (x,n) := median(x,p=linspace(0,1,n-1));
+
+
+Mari kita bandingkan dua distribusi yang sama.
+
+
+\>x=random(1000); y=random(400); ...  
+\>   plot2d("x",0,1,style="--"); ...  
+\>   plot2d(sort(medianexpand(x,400)),sort(y),\>points,color=red,style="x",\>add):
+
+
+![images/TugasAplikom8Adi25030630001-034.png](images/TugasAplikom8Adi25030630001-034.png)
+
+# Regression and Correlation
+
+Regresi linear dapat dilakukan dengan fungsi polyfit() atau berbagai
+fungsi fit lainnya.
+
+
+Sebagai permulaan, kita menentukan garis regresi untuk data univariat
+dengan polyfit(x,y,1).
+
+
+\>x=1:10; y=[2,3,1,5,6,3,7,8,9,8]; writetable(x'|y',labc=["x","y"])
+
+
+             x         y
+             1         2
+             2         3
+             3         1
+             4         5
+             5         6
+             6         3
+             7         7
+             8         8
+             9         9
+            10         8
+
+Kita ingin membandingkan fit tak berbobot dan fit berbobot. Pertama,
+koefisien-koefisien dari fit linear.
+
+
+\>p=polyfit(x,y,1)
+
+
+    [0.733333,  0.812121]
+
+Sekarang, koefisien-koefisien dengan bobot yang menekankan nilai-nilai
+terakhir.
+
+
+\>w &= "exp(-(x-10)^2/10)"; pw=polyfit(x,y,1,w=w(x))
+
+
+    [4.71566,  0.38319]
+
+Kita memasukkan semuanya ke dalam satu plot untuk titik-titik data dan
+garis-garis regresi, serta untuk bobot-bobot yang digunakan.
+
+
+\>figure(2,1);  ...  
+\>   figure(1); statplot(x,y,"b",xl="Regression"); ...  
+\>     plot2d("evalpoly(x,p)",\>add,color=blue,style="--"); ...  
+\>     plot2d("evalpoly(x,pw)",5,10,\>add,color=red,style="--"); ...  
+\>   figure(2); plot2d(w,1,10,\>filled,style="/",fillcolor=red,xl=w); ...  
+\>   figure(0):
+
+
+![images/TugasAplikom8Adi25030630001-035.png](images/TugasAplikom8Adi25030630001-035.png)
+
+Sebagai contoh lainnya, kita membaca data survei mahasiswa—meliputi
+usia mereka, usia orang tua mereka, serta jumlah saudara kandung—dari
+sebuah berkas.
+
+
+Tabel ini memuat "m" dan "f" pada kolom kedua. Kita menggunakan
+variabel tok2 untuk menetapkan padanan terjemahan yang tepat alih-alih
+membiarkan readtable() mengumpulkan terjemahannya sendiri.
+
+
+\>{MS,hd}:=readtable("table1.dat",tok2:=["m","f"]);  ...  
+\>   writetable(MS,labc=hd,tok2:=["m","f"]);
+
+
+        Person       Sex       Age    Mother    Father  Siblings
+             1         m        29        58        61         1
+             2         f        26        53        54         2
+             3         m        24        49        55         1
+             4         f        25        56        63         3
+             5         f        25        49        53         0
+             6         f        23        55        55         2
+             7         m        23        48        54         2
+             8         m        27        56        58         1
+             9         m        25        57        59         1
+            10         m        24        50        54         1
+            11         f        26        61        65         1
+            12         m        24        50        52         1
+            13         m        29        54        56         1
+            14         m        28        48        51         2
+            15         f        23        52        52         1
+            16         m        24        45        57         1
+            17         f        24        59        63         0
+            18         f        23        52        55         1
+            19         m        24        54        61         2
+            20         f        23        54        55         1
+
+Bagaimana usia-usia tersebut saling bergantung satu sama lain?
+Gambaran awal diperoleh melalui pairwise scatterplot.
+
+
+\>scatterplots(tablecol(MS,3:5),hd[3:5]):
+
+
+![images/TugasAplikom8Adi25030630001-036.png](images/TugasAplikom8Adi25030630001-036.png)
+
+Jelas terlihat bahwa usia ayah dan usia ibu saling bergantung satu
+sama lain. Mari kita tentukan dan plot garis regresinya.
+
+
+\>cs:=MS[,4:5]'; ps:=polyfit(cs[1],cs[2],1)
+
+
+    [17.3789,  0.740964]
+
+Model ini jelas keliru. Garis regresinya akan menjadi s=17+0.74t,
+dengan t menyatakan usia ibu dan s menyatakan usia ayah. Selisih usia
+mungkin sedikit bergantung pada usia, tetapi tidak sebesar itu.
+
+
+Sebaliknya, kita menduga adanya fungsi seperti s=a+t. Maka a adalah
+rerata dari s-t. Nilai tersebut merupakan selisih usia rata-rata
+antara ayah dan ibu.
+
+
+\>da:=mean(cs[2]-cs[1])
+
+
+    3.65
+
+Mari kita plot ini ke dalam satu plot sebar.
+
+
+\>plot2d(cs[1],cs[2],\>points);  ...  
+\>   plot2d("evalpoly(x,ps)",color=red,style=".",\>add);  ...  
+\>   plot2d("x+da",color=blue,\>add):
+
+
+![images/TugasAplikom8Adi25030630001-037.png](images/TugasAplikom8Adi25030630001-037.png)
+
+Berikut adalah box plot dari kedua usia tersebut. Grafik ini hanya
+menunjukkan bahwa kedua usia tersebut berbeda.
+
+
+\>boxplot(cs,["mothers","fathers"]):
+
+
+![images/TugasAplikom8Adi25030630001-038.png](images/TugasAplikom8Adi25030630001-038.png)
+
+Menariknya, selisih pada nilai-nilai median tidak sebesar selisih pada
+nilai-nilai rerata.
+
+
+\>median(cs[2])-median(cs[1])
+
+
+    1.5
+
+Koefisien korelasi menunjukkan adanya korelasi positif.
+
+
+\>correl(cs[1],cs[2])
+
+
+    0.7588307236
+
+Korelasi peringkat merupakan ukuran kesamaan urutan pada kedua vektor.
+Nilai ini juga cukup positif.
+
+
+\>rankcorrel(cs[1],cs[2])
+
+
+    0.758925292358
+
+# Creating new Functions
+
+Tentu saja, bahasa EMT dapat digunakan untuk memprogram fungsi-fungsi
+baru. Misalnya, kita mendefinisikan fungsi skewness.
+
+
+$$\text{sk}(x) = \dfrac{\sqrt{n} \sum_i (x_i-m)^3}{\left(\sum_i (x_i-m)^2\right)^{3/2}}$$dengan m menyatakan rerata dari x.
+
+
+\>function skew (x:vector) ...
+
+
+    m=mean(x);
+    return sqrt(cols(x))*sum((x-m)^3)/(sum((x-m)^2))^(3/2);
+    endfunction
+</pre>
+Seperti yang terlihat, kita dapat dengan mudah memanfaatkan bahasa
+matriks untuk memperoleh implementasi yang sangat singkat dan efisien.
+Mari kita coba fungsi ini.
+
+
+\>data=normal(20); skew(normal(10))
+
+
+    0.521806329961
+
+Berikut adalah fungsi lainnya, yang disebut koefisien skewness
+Pearson.
+
+
+\>function skew1 (x) := 3\*(mean(x)-median(x))/dev(x)
+
+\>skew1(data)
+
+
+    0.573102925949
+
+# Monte Carlo Simulation
+
+Euler dapat digunakan untuk menyimulasikan kejadian-kejadian acak.
+Kita telah melihat beberapa contoh sederhana di atas. Berikut adalah
+contoh lainnya, yang menyimulasikan 1.000 kali lemparan 3 dadu dan
+menanyakan distribusi dari jumlahnya.
+
+
+\>ds:=sum(intrandom(1000,3,6))';  fs=getmultiplicities(3:18,ds)
+
+
+    [5,  12,  25,  49,  73,  94,  128,  141,  124,  116,  105,  62,  37,
+    19,  7,  3]
+
+Kita sekarang dapat memplot ini.
+
+
+\>columnsplot(fs,lab=3:18):
+
+
+![images/TugasAplikom8Adi25030630001-040.png](images/TugasAplikom8Adi25030630001-040.png)
+
+Menentukan distribusi yang diharapkan tidaklah begitu mudah. Untuk
+keperluan ini, kita menggunakan rekursi tingkat lanjut.
+
+
+Fungsi berikut menghitung banyaknya cara bilangan k dapat dinyatakan
+sebagai jumlah dari n bilangan dalam rentang 1 hingga m. Fungsi ini
+bekerja secara rekursif dengan cara yang cukup jelas.
+
+
+\>function map countways (k; n, m) ...
+
+
+      if n==1 then return k>=1 && k<=m
+      else
+        sum=0; 
+        loop 1 to m; sum=sum+countways(k-#,n-1,m); end;
+        return sum;
+      end;
+    endfunction
+</pre>
+Berikut adalah hasilnya untuk tiga kali lemparan dadu.
+
+
+\>countways(5:25,5,5)
+
+
+    [1,  5,  15,  35,  70,  121,  185,  255,  320,  365,  381,  365,  320,
+    255,  185,  121,  70,  35,  15,  5,  1]
+
+\>cw=countways(3:18,3,6)
+
+
+    [1,  3,  6,  10,  15,  21,  25,  27,  27,  25,  21,  15,  10,  6,  3,
+    1]
+
+Kita menambahkan nilai-nilai yang diharapkan ke dalam plot.
+
+
+\>plot2d(cw/6^3\*1000,\>add); plot2d(cw/6^3\*1000,\>points,\>add):
+
+
+![images/TugasAplikom8Adi25030630001-041.png](images/TugasAplikom8Adi25030630001-041.png)
+
+Untuk simulasi lainnya, simpangan dari nilai rerata sebanyak $n$
+peubah acak berdistribusi normal baku N(0,1) adalah 1/\sqrt{n}.
+
+
+\>longformat; 1/sqrt(10)
+
+
+    0.316227766017
+
+Mari kita periksa hal ini dengan sebuah simulasi. Kita membangkitkan
+10.000 kali sebanyak 10 vektor acak.
+
+
+\>M=normal(10000,10); dev(mean(M)')
+
+
+    0.318861419326
+
+\>plot2d(mean(M)',\>distribution):
+
+
+![images/TugasAplikom8Adi25030630001-042.png](images/TugasAplikom8Adi25030630001-042.png)
+
+Median dari 10 bilangan acak berdistribusi normal baku memiliki
+simpangan yang lebih besar.
+
+
+\>dev(median(M)')
+
+
+    0.376651504162
+
+Karena kita dapat dengan mudah membangkitkan random walk, kita dapat
+menyimulasikan proses Wiener. Kita mengambil 1.000 langkah dari 1.000
+proses. Kita kemudian memplot simpangan baku dan rerata dari langkah
+ke-$n$ proses-proses tersebut bersama dengan nilai-nilai yang
+diharapkan berwarna merah.
+
+
+\>n=1000; m=1000; M=cumsum(normal(n,m)/sqrt(m)); ...  
+\>   t=(1:n)/n; figure(2,1); ...  
+\>   figure(1); plot2d(t,mean(M')'); plot2d(t,0,color=red,\>add); ...  
+\>   figure(2); plot2d(t,dev(M')'); plot2d(t,sqrt(t),color=red,\>add); ...  
+\>   figure(0):
+
+
+![images/TugasAplikom8Adi25030630001-043.png](images/TugasAplikom8Adi25030630001-043.png)
+
+# Tests
+
+Uji statistik merupakan perangkat yang penting dalam statistika. Di
+dalam Euler, banyak uji yang telah diimplementasikan. Seluruh uji
+tersebut mengembalikan besar galat yang kita terima apabila kita
+menolak hipotesis nol.
+
+
+Sebagai contoh, kita menguji hasil lemparan dadu terhadap distribusi
+seragam. Pada 600 kali lemparan, kita memperoleh nilai-nilai berikut,
+yang kemudian kita masukkan ke dalam uji khi-kuadrat.
+
+
+\>chitest([90,103,114,101,103,89],dup(100,6)')
+
+
+    0.498830517952
+
+Uji khi-kuadrat juga memiliki mode yang menggunakan simulasi Monte
+Carlo untuk menguji statistiknya. Hasilnya seharusnya hampir sama.
+Parameter &gt;p menginterpretasikan vektor y sebagai vektor peluang.
+
+
+\>chitest([90,103,114,101,103,89],dup(1/6,6)',\>p,\>montecarlo)
+
+
+    0.517
+
+Galat ini terlalu besar. Oleh karena itu, kita tidak dapat menolak
+distribusi seragam. Hal ini tidak membuktikan bahwa dadu kita adil
+(fair), tetapi kita tidak dapat menolak hipotesis kita.
+
+
+Berikutnya, kita membangkitkan 1.000 kali lemparan dadu menggunakan
+pembangkit bilangan acak, lalu melakukan uji yang sama.
+
+
+\>n=1000; t=random([1,n\*6]); chitest(count(t\*6,6),dup(n,6)')
+
+
+    0.608613608204
+
+Mari kita uji untuk nilai rerata 100 dengan uji-t.
+
+
+\>s=200+normal([1,100])\*10; ...  
+\>   ttest(mean(s),dev(s),100,200)
+
+
+    0.39980320739
+
+Fungsi ttest() memerlukan nilai rerata, simpangan, banyaknya data,
+serta nilai rerata yang akan diuji.
+
+
+Sekarang mari kita periksa dua pengukuran untuk rerata yang sama. Kita
+menolak hipotesis bahwa keduanya memiliki rerata yang sama jika
+hasilnya kurang dari 0,05.
+
+
+\>tcomparedata(normal(1,10),normal(1,10))
+
+
+    0.275550209428
+
+Jika kita menambahkan bias pada salah satu distribusi, kita memperoleh
+lebih banyak penolakan. Ulangi simulasi ini beberapa kali untuk
+melihat efeknya.
+
+
+\>tcomparedata(normal(1,10),normal(1,10)+2)
+
+
+    3.76360968102e-06
+
+Pada contoh berikutnya, kita membangkitkan 20 lemparan dadu acak
+sebanyak 100 kali dan menghitung banyaknya angka satu di dalamnya.
+Rata-rata harus terdapat 20/6 = 3,3 angka satu.
+
+
+\>R=random(100,20); R=sum(R\*6<=1)'; mean(R)
+
+
+    3.14
+
+Kita sekarang membandingkan banyaknya angka satu dengan distribusi
+binomial. Pertama, kita memplot distribusi dari banyaknya angka satu.
+
+
+\>plot2d(R,distribution=max(R)+1,even=1,style="\\/"):
+
+
+![images/TugasAplikom8Adi25030630001-044.png](images/TugasAplikom8Adi25030630001-044.png)
+
+\>t=count(R,21);
+
+
+Kemudian kita menghitung nilai-nilai yang diharapkan.
+
+
+\>n=0:20; b=bin(20,n)\*(1/6)^n\*(5/6)^(20-n)\*100;
+
+
+Kita harus menggabungkan beberapa nilai untuk memperoleh
+kategori-kategori yang cukup besar.
+
+
+\>t1=sum(t[1:2])|t[3:7]|sum(t[8:21]); ...  
+\>   b1=sum(b[1:2])|b[3:7]|sum(b[8:21]);
+
+
+Uji khi-kuadrat menolak hipotesis bahwa distribusi kita merupakan
+distribusi binomial jika hasilnya kurang dari 0,05.
+
+
+\>chitest(t1,b1)
+
+
+    0.405510807841
+
+Contoh berikut memuat hasil dari dua kelompok orang (misalnya
+laki-laki dan perempuan) yang memilih salah satu dari enam partai.
+
+
+\>A=[23,37,43,52,64,74;27,39,41,49,63,76];  ...  
+\>     writetable(A,wc=6,labr=["m","f"],labc=1:6)
+
+
+               1     2     3     4     5     6
+         m    23    37    43    52    64    74
+         f    27    39    41    49    63    76
+
+Kita ingin menguji independensi pilihan suara terhadap jenis kelamin.
+Uji tabel $\chi^2$ melakukan pengujian ini. Hasilnya terlalu besar
+untuk menolak independensi. Oleh karena itu, berdasarkan data ini,
+kita tidak dapat menyatakan apakah pilihan suara bergantung pada jenis
+kelamin.
+
+
+\>tabletest(A)
+
+
+    0.990701632326
+
+Tabel berikut merupakan tabel ekspektasi apabila kita mengasumsikan
+frekuensi teramati dari pilihan suara tersebut.
+
+
+\>writetable(expectedtable(A),wc=6,dc=1,labr=["m","f"],labc=1:6)
+
+
+               1     2     3     4     5     6
+         m  24.9  37.9  41.9  50.3  63.3  74.7
+         f  25.1  38.1  42.1  50.7  63.7  75.3
+
+Kita dapat menghitung koefisien kontingensi terkoreksi. Karena
+nilainya sangat dekat dengan 0, kita menyimpulkan bahwa pilihan suara
+tidak bergantung pada jenis kelamin.
+
+
+\>contingency(A)
+
+
+    0.0427225484717
+
+# Some More Tests
+
+Berikutnya, kita menggunakan analisis varians (uji-F) untuk menguji
+tiga sampel data berdistribusi normal agar memiliki nilai rerata yang
+sama. Metode ini disebut ANOVA (analysis of variance). Di Euler,
+fungsi varanalysis() digunakan.
+
+
+\>x1=[109,111,98,119,91,118,109,99,115,109,94]; mean(x1),
+
+
+    106.545454545
+
+\>x2=[120,124,115,139,114,110,113,120,117]; mean(x2),
+
+
+    119.111111111
+
+\>x3=[120,112,115,110,105,134,105,130,121,111]; mean(x3)
+
+
+    116.3
+
+\>varanalysis(x1,x2,x3)
+
+
+    0.0138048221371
+
+Ini berarti kita menolak hipotesis bahwa nilai reratanya sama. Kita
+melakukan hal ini dengan peluang galat sebesar 1,3%.
+
+
+Terdapat pula uji median, yang menolak sampel-sampel data dengan
+sebaran rerata yang berbeda dengan menguji median dari sampel gabungan
+tersebut.
+
+
+\>a=[56,66,68,49,61,53,45,58,54];
+
+\>b=[72,81,51,73,69,78,59,67,65,71,68,71];
+
+\>mediantest(a,b)
+
+
+    0.0241724220052
+
+Uji lain mengenai kesamaan adalah uji peringkat. Uji ini jauh lebih
+tajam dibandingkan uji median.
+
+
+\>ranktest(a,b)
+
+
+    0.00199969612469
+
+Pada contoh berikut, kedua distribusi memiliki rerata yang sama.
+
+
+\>ranktest(random(1,100),random(1,50)\*3-1)
+
+
+    0.485688783753
+
+Sekarang mari kita coba mensimulasikan dua perlakuan a dan b yang
+diterapkan pada orang-orang yang berbeda.
+
+
+\>a=[8.0,7.4,5.9,9.4,8.6,8.2,7.6,8.1,6.2,8.9];
+
+\>b=[6.8,7.1,6.8,8.3,7.9,7.2,7.4,6.8,6.8,8.1];
+
+
+Uji tanda menentukan apakah a lebih baik daripada b.
+
+
+\>signtest(a,b)
+
+
+    0.0546875
+
+Galat ini terlalu besar. Kita tidak dapat menolak hipotesis bahwa a
+sama baiknya dengan b.
+
+
+Uji Wilcoxon lebih tajam daripada uji ini, tetapi bergantung pada
+nilai kuantitatif dari selisih-selisih tersebut.
+
+
+\>wilcoxon(a,b)
+
+
+    0.0296680599405
+
+Mari kita coba dua uji lagi dengan menggunakan deret yang
+dibangkitkan.
+
+
+\>wilcoxon(normal(1,20),normal(1,20)-1)
+
+
+    0.0284572962926
+
+\>wilcoxon(normal(1,20),normal(1,20))
+
+
+    0.87642769873
+
+# Random Numbers
+
+Berikut ini adalah pengujian untuk generator angka acak. Euler
+menggunakan generator yang sangat baik, jadi kita tidak perlu
+mengkhawatirkan adanya masalah.
+
+
+Pertama, kita menghasilkan sepuluh juta angka acak dalam interval
+[0,1].
+
+
+\>n:=10000000; r:=random(1,n);
+
+
+Selanjutnya, kita menghitung jarak antara dua angka yang kurang dari
+0,05.
+
+
+\>a:=0.05; d:=differences(nonzeros(r<a));
+
+
+Terakhir, kita memplot berapa kali setiap jarak muncul, dan
+membandingkannya dengan nilai yang diharapkan.
+
+
+\>m=getmultiplicities(1:100,d); plot2d(m); ...  
+\>     plot2d("n\*(1-a)^(x-1)\*a^2",color=red,\>add):
+
+
+![images/TugasAplikom8Adi25030630001-045.png](images/TugasAplikom8Adi25030630001-045.png)
+
+Bersihkan data.
+
+
+\>remvalue n;
+
+
+# Introduction for Users of the R Project
+
+Jelas bahwa EMT tidak bersaing dengan R sebagai paket statistik.
+Namun, ada banyak prosedur dan fungsi statistik yang juga tersedia di
+EMT. Jadi, EMT dapat memenuhi kebutuhan dasar. Lagipula, EMT
+dilengkapi dengan paket numerik dan sistem aljabar komputer.
+
+
+Catatan buku kerja (notebook) ini ditujukan bagi Anda yang sudah
+familiar dengan R, tetapi perlu mengetahui perbedaan sintaksis antara
+EMT dan R. Kami berupaya memberikan gambaran tentang hal-hal yang
+jelas maupun yang kurang jelas yang perlu Anda ketahui.
+
+
+Selain itu, kita akan melihat cara bertukar data antara kedua sistem
+tersebut
+
+
+Perlu dicatat bahwa ini masih dalam proses pengerjaan.
+
+
+# Basic Syntax
+
+Hal pertama yang Anda pelajari di R adalah membuat vektor. Di EMT,
+perbedaan utamanya adalah operator : dapat menerima ukuran langkah
+(step size). Selain itu, operator ini memiliki prioritas pengikatan
+(binding power) yang rendah.
+
+
+\>n=10; 0:n/20:n-1
+
+
+    [0,  0.5,  1,  1.5,  2,  2.5,  3,  3.5,  4,  4.5,  5,  5.5,  6,  6.5,
+    7,  7.5,  8,  8.5,  9]
+
+Fungsi c() tidak ada. Vektor dapat digunakan untuk menggabungkan
+berbagai elemen.
+
+
+Contoh berikut, seperti banyak contoh lainnya, berasal dari
+"Introduction to R" yang disertakan bersama proyek R. Jika Anda
+membaca PDF ini, Anda akan menemukan bahwa saya mengikuti alurnya
+dalam tutorial ini.
+
+
+\>x=[10.4, 5.6, 3.1, 6.4, 21.7]; [x,0,x]
+
+
+    [10.4,  5.6,  3.1,  6.4,  21.7,  0,  10.4,  5.6,  3.1,  6.4,  21.7]
+
+Operator titik dua dengan ukuran langkah di EMT digantikan oleh fungsi
+seq() di R. Kita dapat menulis fungsi ini di EMT.
+
+
+\>function seq(a,b,c) := a:b:c; ...  
+\>   seq(0,-0.1,-1)
+
+
+    [0,  -0.1,  -0.2,  -0.3,  -0.4,  -0.5,  -0.6,  -0.7,  -0.8,  -0.9,  -1]
+
+Fungsi rep() dari R tidak tersedia di EMT. Untuk input vektor, fungsi
+ini dapat ditulis sebagai berikut.
+
+
+\>function rep(x:vector,n:index) := flatten(dup(x,n)); ...  
+\>   rep(x,2)
+
+
+    [10.4,  5.6,  3.1,  6.4,  21.7,  10.4,  5.6,  3.1,  6.4,  21.7]
+
+Perlu dicatat bahwa = atau := digunakan untuk penugasan (assignment).
+Operator -&gt; digunakan untuk satuan (units) di EMT.
+
+
+\>125km -\> " miles"
+
+
+    77.6713990297 miles
+
+Operator "&lt;-" untuk penugasan memang membingungkan, dan bukan ide yang
+bagus dari R. Perintah berikut akan membandingkan a dan -4 di EMT.
+
+
+\>a=2; a<-4
+
+
+    0
+
+Di R, a&lt;-4&lt;3 dapat berfungsi, tetapi a&lt;-4&lt;-3 tidak. Saya juga
+mengalami ambiguitas serupa di EMT, namun berusaha menghilangkannya
+secara bertahap.
+
+
+EMT dan R memiliki vektor bertipe boolean. Namun di EMT, angka 0 dan 1
+digunakan untuk merepresentasikan false dan true. Meskipun demikian,
+di R nilai true dan false tetap dapat digunakan dalam aritmetika biasa
+seperti halnya di EMT.
+
+
+\>x<5, %\*x
+
+
+    [0,  0,  1,  0,  0]
+    [0,  0,  3.1,  0,  0]
+
+EMT memunculkan kesalahan (error) atau menghasilkan NAN bergantung
+pada penanda (flag) 'errors'.
+
+
+\>errors off; 0/0, isNAN(sqrt(-1)), errors on;
+
+
+    NAN
+    1
+
+String di R dan EMT adalah sama. Keduanya menggunakan locale
+(pengaturan lokal) saat ini, bukan Unicode.
+
+
+Di R, terdapat paket-paket untuk Unicode. Di EMT, sebuah string dapat
+berupa string Unicode. String Unicode dapat diterjemahkan ke pengodean
+lokal (local encoding) dan sebaliknya. Selain itu, u"..." dapat memuat
+entitas HTML.
+
+
+\>u"&#169; Ren&eacut; Grothmann"
+
+
+    Â© RenÃ© Grothmann
+
+Karakter berikut mungkin dapat atau tidak dapat ditampilkan dengan
+benar di sistem Anda sebagai huruf A dengan titik dan garis di
+atasnya. Hal ini bergantung pada font yang Anda gunakan.
+
+
+\>chartoutf([480])
+
+
+    Ç 
+
+Penggabungan string (string concatenation) dilakukan dengan + atau |.
+Penggabungan ini dapat menyertakan angka, yang akan dicetak dalam
+format saat ini.
+
+
+\>"pi = "+pi
+
+
+    pi = 3.14159265359
+
+# Indexing
+
+Sebagian besar waktu, hal ini akan berfungsi sama seperti di R.
+
+
+Namun, EMT akan menafsirkan indeks negatif dari bagian belakang
+vektor, sedangkan R menafsirkan x[-n] (tertulis x[n] pada teks asli)
+sebagai x tanpa elemen ke-n.
+
+
+\>x, x[1:3], x[-2]
+
+
+    [10.4,  5.6,  3.1,  6.4,  21.7]
+    [10.4,  5.6,  3.1]
+    6.4
+
+Perilaku R tersebut dapat dicapai di EMT dengan menggunakan drop().
+
+
+\>drop(x,2)
+
+
+    [10.4,  3.1,  6.4,  21.7]
+
+Vektor logika tidak diperlakukan secara berbeda sebagai indeks di EMT,
+berbeda dengan di R. Anda perlu mengekstrak elemen bukan nol
+(non-zero) terlebih dahulu di EMT.
+
+
+\>x, x\>5, x[nonzeros(x\>5)]
+
+
+    [10.4,  5.6,  3.1,  6.4,  21.7]
+    [1,  1,  0,  1,  1]
+    [10.4,  5.6,  6.4,  21.7]
+
+Sama seperti di R, vektor indeks dapat berisi pengulangan.
+
+
+\>x[[1,2,2,1]]
+
+
+    [10.4,  5.6,  5.6,  10.4]
+
+Namun, penamaan untuk indeks tidak dimungkinkan di EMT. Untuk sebuah
+paket statistik, hal ini sering kali diperlukan guna mempermudah akses
+ke elemen-elemen vektor.
+
+
+Untuk meniru perilaku ini, kita dapat mendefinisikan sebuah fungsi
+seperti berikut.
+
+
+\>function pilih (v,i,s) := v[indexof(s,i)]; ...  
+\>    s=["first","second","third","fourth"]; pilih(x,["first","third"],s)
+
+
+    [10.4,  3.1]
+
+# Data Types
+
+EMT memiliki tipe data yang lebih tetap (fixed) dibandingkan R.
+Jelasnya, di R terdapat vektor yang dapat tumbuh (growing vectors).
+Anda dapat mengatur vektor numerik kosong v dan menetapkan nilai ke
+elemen v[17]. Hal ini tidak dimungkinkan di EMT.
+
+
+Contoh berikut ini agak kurang efisien.
+
+
+\>v=[]; for i=1 to 10000; v=v|i; end;
+
+
+EMT kini akan menyusun sebuah vektor dengan v dan i yang ditambahkan
+pada stack lalu menyalin kembali vektor tersebut ke variabel global v.
+
+
+Cara yang lebih efisien adalah dengan mendefinisikan vektor terlebih
+dahulu (pre-defines).
+
+
+\>v=zeros(10000); for i=1 to 10000; v[i]=i; end;
+
+
+Untuk mengubah tipe data di EMT, Anda dapat menggunakan fungsi seperti
+complex().
+
+
+\>complex(1:4)
+
+
+    [ 1+0i ,  2+0i ,  3+0i ,  4+0i  ]
+
+Konversi ke string hanya dimungkinkan untuk tipe data elementer.
+Format saat ini digunakan untuk penggabungan string sederhana. Namun,
+terdapat fungsi seperti print() atau frac().
+
+
+Untuk vektor, Anda dapat dengan mudah menulis fungsi Anda sendiri.
+
+
+\>function tostr (v) ...
+
+
+    s="[";
+    loop 1 to length(v);
+       s=s+print(v[#],2,0);
+       if #<length(v) then s=s+","; endif;
+    end;
+    return s+"]";
+    endfunction
+</pre>
+\>tostr(linspace(0,1,10))
+
+
+    [0.00,0.10,0.20,0.30,0.40,0.50,0.60,0.70,0.80,0.90,1.00]
+
+Untuk komunikasi dengan Maxima, terdapat fungsi convertmxm(), yang
+juga dapat digunakan untuk memformat vektor untuk keluaran (output).
+
+
+\>convertmxm(1:10)
+
+
+    [1,2,3,4,5,6,7,8,9,10]
+
+Untuk LaTeX, perintah tex dapat digunakan untuk memperoleh
+kode/perintah LaTeX.
+
+
+\>tex(&[1,2,3])
+
+
+    \left[ 1 , 2 , 3 \right] 
+
+# Factors and Tables
+
+Dalam pengantar R terdapat contoh dengan yang disebut faktor
+(factors).
+
+
+Berikut ini adalah daftar wilayah dari 30 negara bagian.
+
+
+\>austates = ["tas", "sa", "qld", "nsw", "nsw", "nt", "wa", "wa", ...  
+\>   "qld", "vic", "nsw", "vic", "qld", "qld", "sa", "tas", ...  
+\>   "sa", "nt", "wa", "vic", "qld", "nsw", "nsw", "wa", ...  
+\>   "sa", "act", "nsw", "vic", "vic", "act"];
+
+
+Asumsikan kita memiliki pendapatan yang bersesuaian di setiap negara
+bagian.
+
+
+\>incomes = [60, 49, 40, 61, 64, 60, 59, 54, 62, 69, 70, 42, 56, ...  
+\>   61, 61, 61, 58, 51, 48, 65, 49, 49, 41, 48, 52, 46, ...  
+\>   59, 46, 58, 43];
+
+
+Kini, kita ingin menghitung rata-rata pendapatan di masing-masing
+wilayah. Sebagai program statistik, R memiliki factor() dan tapply()
+(tertulis tappy() pada teks asli) untuk keperluan ini.
+
+
+EMT dapat melakukan hal ini dengan mencari indeks wilayah di dalam
+daftar wilayah yang unik (unique list of territories).
+
+
+\>auterr=sort(unique(austates)); f=indexofsorted(auterr,austates)
+
+
+    [6,  5,  4,  2,  2,  3,  8,  8,  4,  7,  2,  7,  4,  4,  5,  6,  5,  3,
+    8,  7,  4,  2,  2,  8,  5,  1,  2,  7,  7,  1]
+
+Pada titik tersebut, kita dapat menulis fungsi perulangan (loop) kita
+sendiri untuk melakukan operasi hanya pada satu faktor.
+
+
+Atau kita dapat meniru fungsi tapply() dengan cara berikut.
+
+
+\>function map tappl (i; f$:call, cat, x) ...
+
+
+    u=sort(unique(cat));
+    f=indexof(u,cat);
+    return f$(x[nonzeros(f==indexof(u,i))]);
+    endfunction
+</pre>
+Hal ini agak kurang efisien karena menghitung wilayah yang unik untuk
+setiap i, namun tetap berfungsi dengan baik.
+
+
+\>tappl(auterr,"mean",austates,incomes)
+
+
+    [44.5,  57.3333,  55.5,  53.6,  55,  60.5,  56,  52.25]
+
+Perhatikan bahwa cara ini berlaku untuk setiap vektor wilayah.
+
+
+\>tappl(["act","nsw"],"mean",austates,incomes)
+
+
+    [44.5,  57.3333]
+
+Kini, paket statistik EMT mendefinisikan tabel (tables) sama seperti
+di R. Fungsi readtable() dan writetable() dapat digunakan untuk input
+dan output.
+
+
+Dengan demikian, kita dapat menampilkan rata-rata pendapatan negara
+bagian di tiap wilayah dengan cara yang mudah dibaca (friendly).
+
+
+\>writetable(tappl(auterr,"mean",austates,incomes),labc=auterr,wc=7)
+
+
+        act    nsw     nt    qld     sa    tas    vic     wa
+       44.5  57.33   55.5   53.6     55   60.5     56  52.25
+
+Kita juga dapat mencoba meniru perilaku R secara lengkap.
+
+
+Faktor-faktor tersebut sebaiknya disimpan secara jelas dalam sebuah
+koleksi bersama tipe dan kategorinya (negara bagian dan wilayah pada
+contoh kita). Untuk EMT, kita menambahkan indeks yang telah dihitung
+sebelumnya (pre-computed indices).
+
+
+\>function makef (t) ...
+
+
+    ## Factor data
+    ## Returns a collection with data t, unique data, indices.
+    ## See: tapply
+    u=sort(unique(t));
+    return {{t,u,indexofsorted(u,t)}};
+    endfunction
+</pre>
+\>statef=makef(austates);
+
+
+Kini elemen ketiga dari koleksi tersebut akan berisi indeks-indeksnya.
+
+
+\>statef[3]
+
+
+    [6,  5,  4,  2,  2,  3,  8,  8,  4,  7,  2,  7,  4,  4,  5,  6,  5,  3,
+    8,  7,  4,  2,  2,  8,  5,  1,  2,  7,  7,  1]
+
+Kini kita dapat meniru tapply() dengan cara berikut. Fungsi ini akan
+mengembalikan sebuah tabel sebagai koleksi dari data tabel dan judul
+kolom (column headings).
+
+
+\>function tapply (t:vector,tf,f$:call) ...
+
+
+    ## Makes a table of data and factors
+    ## tf : output of makef()
+    ## See: makef
+    uf=tf[2]; f=tf[3]; x=zeros(length(uf));
+    for i=1 to length(uf);
+       ind=nonzeros(f==i);
+       if length(ind)==0 then x[i]=NAN;
+       else x[i]=f$(t[ind]);
+       endif;
+    end;
+    return {{x,uf}};
+    endfunction
+</pre>
+Kita tidak menambahkan banyak pemeriksaan tipe di sini. Satu-satunya
+pencegahan menyangkut kategori (faktor) yang tidak memiliki data.
+Namun, sebaiknya diperiksa kesesuaian panjang t serta kebenaran
+koleksi tf.
+
+
+Tabel ini dapat dicetak sebagai tabel menggunakan writetable().
+
+
+\>writetable(tapply(incomes,statef,"mean"),wc=7)
+
+
+        act    nsw     nt    qld     sa    tas    vic     wa
+       44.5  57.33   55.5   53.6     55   60.5     56  52.25
+
+# Arrays
+
+EMT hanya memiliki dua dimensi untuk larik (arrays). Tipe datanya
+disebut matriks (matrix). Namun, akan mudah untuk menulis fungsi untuk
+dimensi yang lebih tinggi atau pustaka C untuk keperluan ini.
+
+
+R memiliki lebih dari dua dimensi. Di R, larik adalah vektor dengan
+atribut/bidang dimensi (dimension field).
+
+
+Di EMT, vektor adalah matriks dengan satu baris. Vektor dapat diubah
+menjadi matriks menggunakan redim().
+
+
+\>shortformat; X=redim(1:20,4,5)
+
+
+            1         2         3         4         5 
+            6         7         8         9        10 
+           11        12        13        14        15 
+           16        17        18        19        20 
+
+Ekstraksi baris dan kolom, atau sub-matriks, sangat mirip dengan yang
+ada di R.
+
+
+\>X[,2:3]
+
+
+            2         3 
+            7         8 
+           12        13 
+           17        18 
+
+Namun, di R dimungkinkan untuk menetapkan nilai pada daftar indeks
+tertentu dari vektor tersebut. Hal yang sama di EMT hanya dapat
+dilakukan menggunakan perulangan (loop).
+
+
+\>function setmatrixvalue (M, i, j, v) ...
+
+
+    loop 1 to max(length(i),length(j),length(v))
+       M[i{#},j{#}] = v{#};
+    end;
+    endfunction
+</pre>
+Kita mendemonstrasikan hal ini untuk menunjukkan bahwa matriks
+dilewatkan secara referensi (passed by reference) di EMT. Jika Anda
+tidak ingin mengubah matriks asli M, Anda perlu menyalinnya di dalam
+fungsi tersebut.
+
+
+\>setmatrixvalue(X,1:3,3:-1:1,0); X,
+
+
+            1         2         0         4         5 
+            6         0         8         9        10 
+            0        12        13        14        15 
+           16        17        18        19        20 
+
+Produk luar (outer product) di EMT hanya dapat dilakukan antarvektor.
+Hal ini terjadi secara otomatis karena bahasa matriksnya. Satu vektor
+harus berupa vektor kolom dan vektor lainnya berupa vektor baris.
+
+
+\>(1:5)\*(1:5)'
+
+
+            1         2         3         4         5 
+            2         4         6         8        10 
+            3         6         9        12        15 
+            4         8        12        16        20 
+            5        10        15        20        25 
+
+Dalam PDF pengantar untuk R terdapat sebuah contoh yang menghitung
+distribusi dari ab-cd untuk a, b, c, d yang dipilih secara acak dari 0
+hingga n. Solusi di R adalah membentuk matriks berdimensi 4 dan
+menjalankan table() di atasnya.
+
+
+Tentu saja, hal ini dapat dicapai dengan perulangan (loop). Namun,
+perulangan kurang efektif di EMT maupun di R. Di EMT, kita bisa
+menulis perulangan tersebut dalam bahasa C dan itu akan menjadi solusi
+tercepat.
+
+
+Akan tetapi, kita ingin meniru perilaku R. Untuk itu, kita perlu
+meratakan (flatten) hasil perkalian ab dan membuat matriks dari ab-cd.
+
+
+\>a=0:6; b=a'; p=flatten(a\*b); q=flatten(p-p'); ...  
+\>   u=sort(unique(q)); f=getmultiplicities(u,q); ...  
+\>   statplot(u,f,"h"):
+
+
+![images/TugasAplikom8Adi25030630001-046.png](images/TugasAplikom8Adi25030630001-046.png)
+
+Selain multiplisitas eksak (exact multiplicities), EMT dapat
+menghitung frekuensi di dalam vektor.
+
+
+\>getfrequencies(q,-50:10:50)
+
+
+    [0,  23,  132,  316,  602,  801,  333,  141,  53,  0]
+
+Cara termudah untuk memplot ini sebagai sebuah distribusi adalah
+sebagai berikut.
+
+
+\>plot2d(q,distribution=11):
+
+
+![images/TugasAplikom8Adi25030630001-047.png](images/TugasAplikom8Adi25030630001-047.png)
+
+Namun, dimungkinkan juga untuk menghitung jumlah (count) pada interval
+yang dipilih terlebih dahulu (beforehand). Tentu saja, cara berikut
+menggunakan getfrequencies() secara internal.
+
+
+Karena fungsi histo() mengembalikan frekuensi, kita perlu
+menskalakannya agar integral di bawah grafik batang (bar graph)
+bernilai 1.
+
+
+\>{x,y}=histo(q,v=-55:10:55); y=y/sum(y)/differences(x); ...  
+\>   plot2d(x,y,\>bar,style="/"):
+
+
+![images/TugasAplikom8Adi25030630001-048.png](images/TugasAplikom8Adi25030630001-048.png)
+
+# Lists
+
+EMT memiliki dua jenis daftar (lists). Satu berupa daftar global yang
+bersifat mutable (dapat diubah), dan lainnya berupa tipe daftar yang
+bersifat immutable (tidak dapat diubah). Kita tidak membahas daftar
+global di sini.
+
+
+Tipe daftar yang immutable disebut collection (koleksi) di EMT. Tipe
+ini berperilaku seperti struktur (struct) di C, tetapi
+elemen-elemennya hanya diberi nomor dan tidak diberi nama.
+
+
+\>L={{"Fred","Flintstone",40,[1990,1992]}}
+
+
+    Fred
+    Flintstone
+    40
+    [1990,  1992]
+
+Saat ini elemen-elemen tersebut tidak memiliki nama, meskipun nama
+dapat diatur untuk tujuan khusus. Elemen-elemen tersebut diakses
+menggunakan nomor.
+
+
+\>(L[4])[2]
+
+
+    1992
+
+# File Input and Output (Reading and Writing Data)
+
+Anda akan sering ingin mengimpor matriks data dari sumber lain ke EMT.
+Tutorial ini menjelaskan berbagai cara untuk mewujudkannya. Fungsi
+sederhananya adalah writematrix() dan readmatrix().
+
+
+Mari kita demonstrasikan cara membaca dan menulis vektor bilangan riil
+ke sebuah berkas.
+
+
+\>a=random(1,100); mean(a), dev(a),
+
+
+    0.47466
+    0.27327
+
+Untuk menulis data ke sebuah berkas, kita menggunakan fungsi
+writematrix().
+
+
+Karena pengantar ini kemungkinan besar berada di direktori tempat
+pengguna tidak memiliki akses tulis (write access), kita menulis data
+tersebut ke direktori home pengguna. Untuk notebook milik sendiri, hal
+ini tidak diperlukan karena berkas data akan ditulis ke direktori yang
+sama.
+
+
+\>filename="test.dat";
+
+
+Kini kita menulis vektor kolom a' ke berkas tersebut. Hal ini
+menghasilkan satu angka di setiap baris berkas.
+
+
+\>writematrix(a',filename);
+
+
+Untuk membaca data, kita menggunakan readmatrix().
+
+
+\>a=readmatrix(filename)';
+
+
+Lalu hapus berkas tersebut.
+
+
+\>fileremove(filename);
+
+\>mean(a), dev(a),
+
+
+    0.47466
+    0.27327
+
+Fungsi writematrix() atau writetable() dapat dikonfigurasi untuk
+bahasa lain.
+
+
+Misalnya, jika Anda menggunakan sistem bahasa Indonesia (tanda desimal
+berupa koma), Excel Anda membutuhkan nilai dengan koma desimal yang
+dipisahkan oleh titik koma (semicolons) di dalam berkas csv (comma
+separated values, yang standarnya dipisahkan oleh koma). Berkas
+"test.csv" berikut seharusnya muncul di folder Anda saat ini.
+
+
+\>filename="test.csv"; ...  
+\>   writematrix(random(5,3),file=filename,separator=",");
+
+
+Kini Anda dapat membuka berkas ini secara langsung menggunakan Excel
+versi bahasa Indonesia.
+
+
+\>fileremove(filename);
+
+
+Terkadang kita memiliki string dengan token seperti berikut ini.
+
+
+\>s1:="f m m f m m m f f f m m f";  ...  
+\>   s2:="f f f m m f f";
+
+
+Untuk melakukan tokenisasi (tokenize) pada hal ini, kita
+mendefinisikan sebuah vektor token.
+
+
+\>tok:=["f","m"]
+
+
+    f
+    m
+
+Lalu kita dapat menghitung berapa kali setiap token muncul di dalam
+string tersebut, dan memasukkan hasilnya ke dalam sebuah tabel.
+
+
+\>M:=getmultiplicities(tok,strtokens(s1))\_ ...  
+\>     getmultiplicities(tok,strtokens(s2));
+
+
+Tuliskan tabel tersebut dengan header berupa token.
+
+
+\>writetable(M,labc=tok,labr=1:2,wc=8)
+
+
+                   f       m
+           1       6       7
+           2       5       2
+
+Untuk statistika, EMT dapat membaca dan menulis tabel.
+
+
+\>file="test.dat"; open(file,"w"); ...  
+\>   writeln("A,B,C"); writematrix(random(3,3)); ...  
+\>   close();
+
+
+Berkas tersebut terlihat seperti ini.
+
+
+\>printfile(file)
+
+
+    A,B,C
+    0.09108070085843074,0.8993342814237876,0.983635710835939
+    0.211019679874495,0.5527768679829471,0.4941417784439638
+    0.5797836292915086,0.8118750914043666,0.9838772074457084
+    
+
+Fungsi readtable() dalam bentuknya yang paling sederhana dapat membaca
+hal ini dan mengembalikan kumpulan nilai (collection of values) serta
+baris judul/kepala kolom (heading lines).
+
+
+\>L=readtable(file,\>list);
+
+
+Kumpulan ini dapat dicetak dengan writetable() ke notebook, atau ke
+sebuah berkas.
+
+
+\>writetable(L,wc=10,dc=5)
+
+
+             A         B         C
+       0.09108   0.89933   0.98364
+       0.21102   0.55278   0.49414
+       0.57978   0.81188   0.98388
+
+Matriks nilai adalah elemen pertama dari L. Perlu dicatat bahwa mean()
+di EMT menghitung nilai rata-rata dari baris-baris sebuah matriks.
+
+
+\>mean(L[1])
+
+
+      0.65802 
+      0.41931 
+      0.79185 
+
+# CSV Files
+
+Pertama, mari kita tulis sebuah matriks ke dalam sebuah berkas. Untuk
+output-nya, kita menghasilkan sebuah berkas di direktori kerja saat
+ini.
+
+
+\>file="test.csv";  ...  
+\>   M=random(3,3); writematrix(M,file);
+
+
+Berikut adalah isi dari berkas ini.
+
+
+\>printfile(file)
+
+
+    0.2629555460769783,0.9938043902969794,0.9018322446643099
+    0.2407959115075192,0.6359669287024015,0.1510861324343464
+    0.2515041042947438,0.3339714884700144,0.7611390495192349
+    
+
+Berkas CSV (CVS) ini dapat dibuka di Excel pada sistem berbahasa
+Inggris cukup dengan klik ganda. Jika Anda mendapatkan berkas seperti
+ini pada sistem berbahasa Jerman, Anda perlu mengimpor data tersebut
+ke dalam Excel dengan memperhatikan tanda titik desimal (decimal dot).
+
+
+Namun, tanda titik desimal juga merupakan format standar (default)
+untuk EMT. Anda dapat membaca sebuah matriks dari sebuah berkas
+menggunakan readmatrix().
+
+
+\>readmatrix(file)
+
+
+      0.26296    0.9938   0.90183 
+       0.2408   0.63597   0.15109 
+       0.2515   0.33397   0.76114 
+
+Kita dapat menuliskan beberapa matriks ke dalam satu berkas. Perintah
+open() dapat membuka sebuah berkas untuk ditulis menggunakan parameter
+"w". Standarnya (default) adalah "r" untuk membaca.
+
+
+\>open(file,"w"); writematrix(M); writematrix(M'); close();
+
+
+Matriks-matriks tersebut dipisahkan oleh satu baris kosong. Untuk
+membaca matriks-matriks tersebut, buka berkasnya dan panggil
+readmatrix() beberapa kali.
+
+
+\>open(file); A=readmatrix(); B=readmatrix(); A==B, close();
+
+
+            1         0         0 
+            0         1         0 
+            0         0         1 
+
+Di Excel atau aplikasi spreadsheet serupa, Anda dapat mengekspor
+sebuah matriks sebagai CSV (comma separated values). Di Excel 2007,
+gunakan "save as" (simpan sebagai) dan "other formats" (format
+lainnya), lalu pilih "CSV". Pastikan tabel saat ini hanya berisi data
+yang ingin Anda ekspor.
+
+
+Berikut adalah sebuah contoh.
+
+
+\>printfile("excel-data.csv")
+
+
+    0;1000;1000
+    1;1051,271096;1072,508181
+    2;1105,170918;1150,273799
+    3;1161,834243;1233,67806
+    4;1221,402758;1323,129812
+    5;1284,025417;1419,067549
+    6;1349,858808;1521,961556
+    7;1419,067549;1632,31622
+    8;1491,824698;1750,6725
+    9;1568,312185;1877,610579
+    10;1648,721271;2013,752707
+
+Seperti yang Anda lihat, sistem bahasa Jerman saya menggunakan titik
+koma (semicolon) sebagai pemisah dan koma desimal (decimal comma).
+Anda dapat mengubah hal ini di pengaturan sistem atau di Excel, tetapi
+hal tersebut tidak diperlukan untuk membaca matriks ke dalam EMT.
+
+
+Cara termudah untuk membaca hal ini ke dalam Euler adalah dengan
+readmatrix(). Semua koma diganti menjadi titik dengan parameter
+&gt;comma. Untuk CSV berbahasa Inggris, cukup abaikan parameter ini.
+
+
+\>M=readmatrix("excel-data.csv",\>comma)
+
+
+            0      1000      1000 
+            1    1051.3    1072.5 
+            2    1105.2    1150.3 
+            3    1161.8    1233.7 
+            4    1221.4    1323.1 
+            5      1284    1419.1 
+            6    1349.9      1522 
+            7    1419.1    1632.3 
+            8    1491.8    1750.7 
+            9    1568.3    1877.6 
+           10    1648.7    2013.8 
+
+Mari kita plot data ini.
+
+
+\>plot2d(M'[1],M'[2:3],\>points,color=[red,green]'):
+
+
+![images/TugasAplikom8Adi25030630001-049.png](images/TugasAplikom8Adi25030630001-049.png)
+
+Ada cara yang lebih mendasar untuk membaca data dari sebuah berkas.
+Anda dapat membuka berkas tersebut dan membaca angka-angkanya baris
+demi baris. Fungsi getvectorline() akan membaca angka dari sebuah
+baris data. Secara default, fungsi ini mengharapkan tanda titik
+desimal. Namun, fungsi ini juga dapat menggunakan koma desimal, jika
+Anda memanggil setdecimaldot(",") sebelum menggunakan fungsi ini.
+
+
+Fungsi berikut adalah sebuah contoh untuk hal ini. Fungsi ini akan
+berhenti di akhir berkas atau pada baris kosong.
+
+
+\>function myload (file) ...
+
+
+    open(file);
+    M=[];
+    repeat
+       until eof();
+       v=getvectorline(3);
+       if length(v)>0 then M=M_v; else break; endif;
+    end;
+    return M;
+    close(file);
+    endfunction
+</pre>
+\>myload(file)
+
+
+      0.26296    0.9938   0.90183 
+       0.2408   0.63597   0.15109 
+       0.2515   0.33397   0.76114 
+
+Kita juga dapat membaca semua angka di dalam berkas tersebut
+menggunakan getvector().
+
+
+\>open(file); v=getvector(10000); close(); redim(v[1:9],3,3)
+
+
+      0.26296    0.9938   0.90183 
+       0.2408   0.63597   0.15109 
+       0.2515   0.33397   0.76114 
+
+Dengan demikian, sangat mudah untuk menyimpan sebuah vektor nilai
+dengan satu nilai di setiap baris dan membaca kembali vektor tersebut.
+
+
+\>v=random(1000); mean(v)
+
+
+    0.50339
+
+\>writematrix(v',file); mean(readmatrix(file)')
+
+
+    0.50339
+
+# Using Tables
+
+Tabel dapat digunakan untuk membaca atau menulis data numerik. Sebagai
+contoh, kita menulis sebuah tabel dengan header baris dan kolom ke
+dalam sebuah berkas.
+
+
+\>file="test.tab"; M=random(3,3);  ...  
+\>   open(file,"w");  ...  
+\>   writetable(M,separator=",",labc=["one","two","three"]);  ...  
+\>   close(); ...  
+\>   printfile(file)
+
+
+    one,two,three
+          0.59,      0.81,      0.78
+          0.03,      0.57,      0.22
+          0.66,      0.54,      0.92
+
+Data ini dapat diimpor ke dalam Excel.
+
+
+Untuk membaca berkas tersebut di EMT, kita menggunakan readtable().
+
+
+\>{M,headings}=readtable(file,\>clabs); ...  
+\>   writetable(M,labc=headings)
+
+
+           one       two     three
+          0.59      0.81      0.78
+          0.03      0.57      0.22
+          0.66      0.54      0.92
+
+# Analyzing a Line
+
+Anda bahkan dapat mengevaluasi setiap baris secara manual. Misalkan
+kita memiliki sebuah baris dengan format berikut.
+
+
+\>line="2020-11-03,Tue,1'114.05"
+
+
+    2020-11-03,Tue,1'114.05
+
+Pertama, kita dapat melakukan tokenisasi pada baris tersebut.
+
+
+\>vt=strtokens(line)
+
+
+    2020-11-03
+    Tue
+    1'114.05
+
+Kemudian, kita dapat mengevaluasi setiap elemen pada baris tersebut
+menggunakan evaluasi yang sesuai.
+
+
+\>day(vt[1]),  ...  
+\>   indexof(["mon","tue","wed","thu","fri","sat","sun"],tolower(vt[2])),  ...  
+\>   strrepl(vt[3],"'","")()
+
+
+    7.3816e+05
+    2
+    1114
+
+Dengan menggunakan ekspresi reguler (regular expressions), hampir
+semua informasi dapat diekstrak dari satu baris data.
+
+
+Misalkan kita memiliki baris berikut pada sebuah dokumen HTML.
+
+
+\>line="<tr\><td\>1145.45</td\><td\>5.6</td\><td\>-4.5</td\><tr\>"
+
+
+    &lt;tr&gt;&lt;td&gt;1145.45&lt;/td&gt;&lt;td&gt;5.6&lt;/td&gt;&lt;td&gt;-4.5&lt;/td&gt;&lt;tr&gt;
+
+Untuk mengekstrak hal ini, kita menggunakan ekspresi reguler yang
+mencari:
+
+
+ - tanda kurung tutup (&gt;),  
+ - string apa pun yang tidak mengandung tanda kurung dengan sub-match  
+
+(...),
+
+
+ - tanda kurung buka dan tanda kurung tutup menggunakan solusi
+terpendek,
+
+
+ - sekali lagi string apa pun yang tidak mengandung tanda kurung,
+
+
+ - dan tanda kurung buka (&lt;).
+
+
+Ekspresi reguler memang agak sulit dipelajari, tetapi sangat ampuh.
+
+
+\>{pos,s,vt}=strxfind(line,"\>([^<\>]+)<.+?\>([^<\>]+)<");
+
+
+Hasilnya adalah posisi kecocokan, string yang cocok, dan sebuah vektor
+string untuk sub-kecocokan.
+
+
+\>for k=1:length(vt); vt[k](), end;
+
+
+    1145.5
+    5.6
+
+Berikut adalah sebuah fungsi yang membaca semua item numerik di antara
+&lt;td&gt; dan &lt;/td&gt;.
+
+
+\>function readtd (line) ...
+
+
+    v=[]; cp=0;
+    repeat
+       {pos,s,vt}=strxfind(line,"<td.*?>(.+?)</td>",cp);
+       until pos==0;
+       if length(vt)>0 then v=v|vt[1]; endif;
+       cp=pos+strlen(s);
+    end;
+    return v;
+    endfunction
+</pre>
+\>readtd(line+"<td\>non-numerical</td\>")
+
+
+    1145.45
+    5.6
+    -4.5
+    non-numerical
+
+# Reading from the Web
+
+Sebuah situs web atau berkas dengan URL dapat dibuka di EMT dan dibaca
+baris demi baris.
+
+
+Pada contoh ini, kita membaca versi terbaru dari situs EMT. Kita
+menggunakan ekspresi reguler untuk memindai "Version ..." di dalam
+sebuah heading.
+
+
+\>function readversion () ...
+
+
+    urlopen("http://www.euler-math-toolbox.de/Programs/Changes.html");
+    repeat
+      until urleof();
+      s=urlgetline();
+      k=strfind(s,"Version ",1);
+      if k>0 then substring(s,k,strfind(s,"<",k)-1), break; endif;
+    end;
+    urlclose();
+    endfunction
+</pre>
+\>readversion
+
+
+    Version 2024-01-12
+
+# Input and Output of Variables
+
+Anda dapat menulis sebuah variabel dalam bentuk definisi Euler ke
+dalam sebuah berkas atau ke baris perintah.
+
+
+\>writevar(pi,"mypi");
+
+
+    mypi = 3.141592653589793;
+
+Untuk pengujian, kita membuat sebuah berkas Euler di direktori kerja
+EMT.
+
+
+\>file="test.e"; ...  
+\>   writevar(random(2,2),"M",file); ...  
+\>   printfile(file,3)
+
+
+    M = [ ..
+    0.9607363360294088, 0.5090564281073382;
+    0.67279466809125, 0.688176242399486];
+
+Kita sekarang dapat memuat berkas tersebut. Berkas ini akan
+mendefinisikan matriks M.
+
+
+\>load(file); show M,
+
+
+    M = 
+      0.96074   0.50906 
+      0.67279   0.68818 
+
+Omong-omong, jika writevar() digunakan pada sebuah variabel, fungsi
+ini akan mencetak definisi variabel tersebut beserta nama variabelnya.
+
+
+\>writevar(M); writevar(inch$)
+
+
+    M = [ ..
+    0.9607363360294088, 0.5090564281073382;
+    0.67279466809125, 0.688176242399486];
+    inch$ = 0.0254;
+
+Kita juga dapat membuka berkas baru atau menambahkan (append) ke
+berkas yang sudah ada. Pada contoh ini, kita menambahkan ke berkas
+yang telah dibuat sebelumnya.
+
+
+\>open(file,"a"); ...  
+\>   writevar(random(2,2),"M1"); ...  
+\>   writevar(random(3,1),"M2"); ...  
+\>   close();
+
+\>load(file); show M1; show M2;
+
+
+    M1 = 
+      0.72639   0.62882 
+      0.12019   0.03224 
+    M2 = 
+     0.099173 
+      0.85504 
+      0.92847 
+
+Untuk menghapus berkas apa pun, gunakan fileremove().
+
+
+\>fileremove(file);
+
+
+Sebuah vektor baris di dalam berkas tidak memerlukan koma jika setiap
+angka berada di baris baru. Mari kita buat berkas seperti itu dengan
+menulis setiap baris satu per satu menggunakan writeln().
+
+
+\>open(file,"w"); writeln("M = ["); ...  
+\>   for i=1 to 5; writeln(""+random()); end; ...  
+\>   writeln("];"); close(); ...  
+\>   printfile(file)
+
+
+    M = [
+    0.437022605979
+    0.206717463476
+    0.466146119229
+    0.284765700905
+    0.208351197517
+    ];
+
+\>load(file); M
+
+
+    [0.43702,  0.20672,  0.46615,  0.28477,  0.20835]
+
+## Analisis Data Statistika dengan Euler Math Toolbox (EMT)
+
+Berikut adalah kumpulan studi kasus analisis statistika yang mencakup
+uraian teori, penyelesaian komputasi menggunakan perintah EMT, serta
+interpretasi hasilnya.
+
+
+## Studi Kasus 1: Statistika Deskriptif dan Distribusi Normal
+
+(1) Uraian Materi (Teori) Dalam statistika deskriptif, ukuran
+pemusatan dan ndatadigunakan untuk meringkas karakteristik data
+numerik:
+
+
+- Mean: Nilai rata-rata hitung dari seluruh data, dirumuskan dengan
+
+
+$$\bar{x} = \frac{1}{n}\sum_{i=1}^{n} x_i.$$ - Median: Nilai tengah yang membagi data terurut menjadi dua bagian  
+
+sama besar (50% di bawah dan 50% di atas).
+
+
+- Simpangan Baku (Standard Deviation): Ukuran sebaran data sampel
+terhadap nilai rata-ratanya, dirumuskan sebagai
+
+
+$$s = \sqrt{\frac{1}{n-1}\sum_{i=1}^{n} (x_i - \bar{x})^2}.$$* 
+Distribusi Normal: Distribusi probabilitas kontinu berbentuk lonceng
+* simetris dengan parameter rata-rata
+*   \mu.
+
+
+$$\mu.$$
+
+dan
+
+
+$$\sigma.$$
+
+Fungsi distribusi kumulatifnya (CDF) menyatakan peluang
+
+
+$$P(X \le x) = \int_{-\infty}^{x} \frac{1}{\sigma\sqrt{2\pi}} e^{-\frac{1}{2}\left(\frac{t-\mu}{\sigma}\right)^2} dt.$$(2) Penyelesaian Masalah dengan EMT Permasalahan: Diketahui data waktu
+pengerjaan (dalam menit) dari 12 mahasiswa pada sebuah kuis statistika
+adalah: 45, 50, 48, 52, 47, 55, 49, 51, 46, 53, 50, 49. Hitunglah
+median, rata-rata, simpangan baku, visualisasikan dengan boxplot,
+serta tentukan probabilitas seorang mahasiswa menyelesaikan kuis dalam
+waktu lebih dari 52 menit jika data diasumsikan berdistribusi normal.
+
+
+\>W := [45, 50, 48, 52, 47, 55, 49, 51, 46, 53, 50, 49];
+
+\>median(W), mean(W), dev(W),
+
+
+    49.5
+    49.5833333333
+    2.90636709604
+
+\>aspect(1.75); boxplot(W):
+
+
+![images/TugasAplikom8Adi25030630001-055.png](images/TugasAplikom8Adi25030630001-055.png)
+
+\>print((1 - normaldis(52, mean(W), dev(W))) \* 100, 2, unit=" %")
+
+
+         20.28 %
+
+(3) Penjelasan Hasil Penyelesaian
+
+
+- Perintah median(W) menghasilkan 49.5 menit dan mean(W) menghasilkan
+49.58 menit. Nilai mean dan median yang sangat berdekatan menunjukkan
+sebaran data relatif simetris.
+
+
+- Perintah dev(W) menghasilkan simpangan baku sebesar 2.84 menit, yang
+menunjukkan rata-rata penyimpangan waktu pengerjaan tiap mahasiswa
+dari rata-rata kelas.
+
+
+- Grafik boxplot(W) menampilkan ringkasan lima serangkai (minimum =
+45, Q1 = 47.5, median = 49.5, Q3 = 51.5, maksimum = 55) dan
+mengonfirmasi tidak adanya pencilan (outliers).
+
+
+- Fungsi normaldis(x, m, d) menghitung peluang kumulatif
+
+
+$$P(X \le 52)$$
+
+Karena dicari
+
+
+$$P(X > 52)$$
+
+, digunakan komplemen 1 - normaldis(...) yang menghasilkan 19.77%,
+artinya peluang mahasiswa membutuhkan waktu lebih dari 52 menit adalah
+sekitar 19,77%.
+
+
+## Studi Kasus 2: Analisis Korelasi dan Regresi Linear Sederhana
+
+(1) Uraian Materi (Teori)
+
+
+- Korelasi Pearson (r): Mengukur kekuatan dan arah hubungan linear
+antara dua variabel kuantitatif X dan Y dengan rentang
+
+
+$$-1 \le r \le 1.$$
+
+Nilai mendekati +1 menunjukkan hubungan linear positif yang sangat
+kuat.
+
+
+- Regresi Linear Sederhana: Memodelkan hubungan antara variabel bebas
+X dan variabel terikat Y melalui persamaan garis lurus
+
+
+$$\hat{y} = a + bx,$$
+
+di mana a adalah intersep dan b adalah kemiringan garis (slope)
+berdasarkan metode kuadrat terkecil.
+
+
+(2) Penyelesaian Masalah dengan EMT Permasalahan: Suatu penelitian
+mencatat lama waktu belajar per minggu dalam jam (X) dan nilai ujian
+akhir (Y) dari 8 mahasiswa: X = [4, 6, 8, 10, 12, 14, 16, 18] Y = [55,
+60, 68, 72, 78, 85, 88, 94] Tentukan koefisien korelasi, persamaan
+garis regresi linearnya, dan tampilkan scatter plot beserta garis
+regresinya.
+
+
+\>X := [4, 6, 8, 10, 12, 14, 16, 18];
+
+\>Y := [55, 60, 68, 72, 78, 85, 88, 94];
+
+\>correl(X, Y)
+
+
+    0.997303835993
+
+\>p := polyfit(X, Y, 1)
+
+
+    [44.2262,  2.79762]
+
+\>plot2d(X, Y, \>points, xl="Jam Belajar", yl="Nilai Ujian"); ...  
+\>   plot2d("evalpoly(x, p)", color=red, \>add):
+
+
+![images/TugasAplikom8Adi25030630001-060.png](images/TugasAplikom8Adi25030630001-060.png)
+
+## (3) Penjelasan Hasil Penyelesaian
+
+* 
+Fungsi correl(X, Y) menghasilkan nilai 0.9963. Karena mendekati +1,
+* terdapat hubungan linear positif yang sangat kuat antara durasi
+* belajar dan nilai ujian.
+
+* 
+Fungsi polyfit(X, Y, 1) mengembalikan vektor [44.0476, 2.81548],
+* sehingga persamaan regresinya adalah
+*   \hat{y} = 44.05 + 2.82x.
+
+
+$$\hat{y} = 44.05 + 2.82x.$$
+
+Artinya, setiap penambahan 1 jam waktu belajar diprediksi meningkatkan
+nilai ujian sebesar 2.82 poin.
+
+
+- Perintah plot2d pertama menggambar titik data aktual (&gt;points),
+sedangkan plot2d kedua (&gt;add) menggambar garis regresi merah hasil
+evaluasi polinomial evalpoly(x, p).
+
+
+## Studi Kasus 3: Uji Hipotesis Perbandingan Dua Sampel (Two-Sample
+
+t-Test)
+
+
+(1) Uraian Materi (Teori)
+
+
+- Uji-t Dua Sampel Independen: Digunakan untuk menguji signifikansi
+perbedaan rata-rata antara dua kelompok populasi yang saling bebas.
+
+
+- Hipotesis:
+
+
+$$H_0: \mu_1 = \mu_2$$
+
+(tidak ada perbedaan rata-rata) melawan
+
+
+$$H_1: \mu_1 \ne \mu_2$$
+
+(terdapat perbedaan rata-rata).
+
+
+- Kriteria Keputusan: Menggunakan taraf signifikansi
+
+
+$$\alpha = 0.05.$$
+
+Jika nilai p-value &lt; 0.05, maka hipotesis nol
+
+
+$$H_0$$
+
+ditolak.
+
+
+(2) Penyelesaian Masalah dengan EMT Permasalahan: Seorang dosen
+membandingkan hasil nilai kuis antara Kelas A (metode ceramah) dan
+Kelas B (metode diskusi interaktif). Data nilai kedua kelas adalah:
+Kelas A = [70, 72, 68, 75, 71, 69, 74, 73] Kelas B = [78, 82, 80, 76,
+85, 79, 81, 84] Uji apakah terdapat perbedaan rata-rata nilai yang
+signifikan antara kedua kelas pada taraf signifikansi 0.05.
+
+
+\>kelasA := [70, 72, 68, 75, 71, 69, 74, 73];
+
+\>kelasB := [78, 82, 80, 76, 85, 79, 81, 84];
+
+\>mean(kelasA), mean(kelasB),
+
+
+    71.5
+    80.625
+
+\>tcomparedata(kelasA, kelasB)
+
+
+    2.85967842029e-06
+
+(3) Penjelasan Hasil Penyelesaian - Rata-rata nilai Kelas A adalah
+71.5, sedangkan rata-rata nilai Kelas B adalah 80.625. - Fungsi
+tcomparedata(kelasA, kelasB) menghasilkan nilai p-value sebesar
+8.28e-06 (0.00000828). - Karena p-value &lt; 0.05, maka H_0 ditolak.
+Kesimpulannya, terdapat perbedaan rata-rata yang signifikan secara
+statistik antara hasil belajar Kelas A dan Kelas B, di mana metode
+diskusi interaktif memberikan hasil yang lebih tinggi.
+
+
+## Studi Kasus 4: Pengolahan Tabel Data Eksternal dan Uji Independensi
+
+(table.dat)
+
+
+(1) Uraian Materi (Teori) Dalam analisis survei yang memuat data
+kategorik (token/string) dan nilai hilang (missing value), EMT
+menggunakan fungsi `readtable()` untuk mengonversi data mentah menjadi
+matriks numerik terindeks. Untuk menguji apakah terdapat hubungan
+antara dua variabel kategorik (misalnya jenis kelamin dan pilihan),
+digunakan uji independensi Khi-Kuadrat
+
+
+$$\chi^2$$
+
+melalui tabel kontingensi:
+
+
+$$\chi^2 = \sum \frac{(O_{ij} - E_{ij})^2}{E_{ij}},$$$$\quad E_{ij} = \frac{(\text{Total Baris } i)(\text{Total Kolom } j)}{\text{Total Keseluruhan}}$$
+
+Jika nilai p-value yang dihasilkan `tabletest()` lebih kecil dari
+taraf signifikansi
+
+
+$$\alpha = 0,05$$
+
+, maka kedua variabel tersebut saling bergantung (tidak independen).
+
+
+(2) Penyelesaian Masalah dengan EMT Permasalahan: Gunakan berkas data
+survei `table.dat` (25 responden) untuk menghitung rata-rata tip yang
+diberikan responden (mengabaikan data kosong "."), mengelompokkan
+frekuensi jenis kelamin terhadap kolom `Problem` (y/n), serta menguji
+apakah status `Problem` bergantung pada jenis kelamin pada
+
+
+$$\alpha = 0,05.$$\>ctok := [2, 4, 5, 7];
+
+\>{MT, hd, tok} := readtable("table.dat", ctok=ctok);
+
+\>mean(tablecol(MT, 6))
+
+
+    2.175
+
+\>MT27 := tablecol(MT, [2, 7]);
+
+\>{xu1, xu2, count} := getstatistics(MT27[1], MT27[2]);
+
+\>writetable(count, labr=tok[xu1], labc=tok[xu2])
+
+
+                       n         y
+             m         9         3
+             f         6         7
+
+\>tabletest(count), contingency(count)
+
+
+    0.141326003043
+    0.399114063143
+
+(3) Penjelasan Hasil Penyelesaian
+- Fungsi `readtable("table.dat", ctok=[2,4,5,7])` otomatis menerjemahkan string pada kolom 2, 4, 5, dan 7 menjadi indeks numerik serta mengubah tanda "." menjadi `NAN`.
+- Fungsi `tablecol(MT, 6)` mengekstrak kolom Tip sekaligus melewatkan baris bernilai `NAN` (responden ke-18), menghasilkan rata-rata tip sebesar 2,175.
+- Tabel kontingensi antara jenis kelamin (`m`/`f`) dan `Problem` (`n`/`y`) terbentuk melalui `getstatistics()`.
+- Nilai p-value dari `tabletest(count)` bernilai jauh di atas 0,05 (dengan koefisien kontingensi mendekati 0), sehingga $H_0$ diterima: status `Problem` bersifat independen terhadap jenis kelamin.
+
+
+## Studi Kasus 5: Analisis Korelasi Ganda dan Regresi Usia Keluarga (table1.dat)
+
+(1) Uraian Materi (Teori)
+Selain korelasi Pearson ($r$) yang mengukur hubungan linear dua variabel kuantitatif, korelasi peringkat Spearman (`rankcorrel()`) digunakan untuk mengukur kesamaan urutan peringkat antarvariabel tanpa mengasumsikan linearitas ketat. Sementara itu, fungsi `scatterplots()` memvisualisasikan matriks plot sebar berpasangan untuk melihat pola hubungan multivariat secara serentak.
+
+
+(2) Penyelesaian Masalah dengan EMT
+Permasalahan: Baca berkas data survei mahasiswa `table1.dat` (20 responden). Tampilkan matriks scatter plot untuk usia mahasiswa (`Age`), usia ibu (`Mother`), dan usia ayah (`Father`), lalu hitung koefisien korelasi Pearson dan Spearman antara usia mahasiswa dengan usia ayahnya, serta bentuk garis regresi linearnya.
+
+
+\>{MS, hd} := readtable("table1.dat", tok2:=["m", "f"]);
+
+\>scatterplots(tablecol(MS, 3:5), hd[3:5]):
+
+
+![images/TugasAplikom8Adi25030630001-071.png](images/TugasAplikom8Adi25030630001-071.png)
+
+\>agemhs := MS[, 3]'; ageayah := MS[, 5]';
+
+\>correl(agemhs, ageayah), rankcorrel(agemhs, ageayah)
+
+
+    0.188534493807
+    0.262237924465
+
+\>pkel := polyfit(agemhs, ageayah, 1)
+
+
+    [46.8513,  0.392735]
+
+(3) Penjelasan Hasil Penyelesaian
+- Parameter `tok2:=["m", "f"]` memetakan kode jenis kelamin pada kolom kedua secara eksplisit.
+- `scatterplots()` menampilkan hubungan berpasangan antara usia mahasiswa, ibu, dan ayah dalam satu kanvas.
+- Hasil `correl()` dan `rankcorrel()` menunjukkan derajat hubungan linear maupun urutan peringkat antara usia mahasiswa dan usia ayah, sedangkan `polyfit(..., 1)` menghasilkan koefisien intersep dan kemiringan garis regresinya.
+
+
+## Studi Kasus 6: Impor Data CSV Berformat Eropa dan Pertumbuhan Eksponensial (excel-data.csv)
+
+(1) Uraian Materi (Teori)
+Berkas CSV dari sistem regional Eropa/Indonesia umumnya menggunakan titik koma (`;`) sebagai pemisah kolom dan koma (`,`) sebagai tanda desimal. Di EMT, flag `&gt;comma` pada fungsi `readmatrix()` secara otomatis mengonversi koma desimal menjadi titik desimal standar.
+
+
+(2) Penyelesaian Masalah dengan EMT
+Permasalahan: Impor data deret waktu pertumbuhan dua investasi awal 1000 dari berkas `excel-data.csv` ($t = 0$ hingga $t = 10$), hitung laju pertumbuhan rata-rata tahunannya, dan visualisasikan perbandingan kedua kurva pertumbuhan tersebut.
+
+
+\>Mcsv := readmatrix("excel-data.csv", \>comma);
+
+\>tcsv := Mcsv'[1]; inv1 := Mcsv'[2]; inv2 := Mcsv'[3];
+
+\>plot2d(tcsv, inv1, color=blue, xl="Tahun (t)", yl="Nilai Investasi"); ...  
+\>   plot2d(tcsv, inv2, color=red, \>add):
+
+
+![images/TugasAplikom8Adi25030630001-072.png](images/TugasAplikom8Adi25030630001-072.png)
+
+\>mean(inv1[2:11]/inv1[1:10]) - 1, mean(inv2[2:11]/inv2[1:10]) - 1
+
+
+    0.0512710963951
+    0.0725081812292
+
+(3) Penjelasan Hasil Penyelesaian
+- Perintah `readmatrix("excel-data.csv", &gt;comma)` berhasil membaca matriks berukuran $11 \times 3$ tanpa perlu mengubah pengaturan regional sistem operasi.
+- Plot memperlihatkan dua kurva pertumbuhan majemuk dari modal awal 1000, di mana kurva merah (kolom 3) tumbuh lebih cepat (~7,25% per periode) dibandingkan kurva biru (kolom 2, ~5,13% per periode).
+
+
+## Studi Kasus 7: Pembacaan Tabel Ber-Header dan Perbandingan Statistik Baris vs Kolom (test.csv)
+
+(1) Uraian Materi (Teori)
+Di EMT, fungsi statistik bawaan seperti `mean()` dan `dev()` pada sebuah matriks bekerja secara horizontal (menghitung statistik untuk setiap baris matriks). Untuk menghitung rata-rata atau simpangan baku per kolom/variabel, matriks perlu ditransposisikan terlebih dahulu menggunakan operator petik tunggal (`'`).
+
+
+(2) Penyelesaian Masalah dengan EMT
+Permasalahan: Baca berkas `test.csv` yang memuat header kolom `A, B, C` beserta 3 baris data numerik. Hitung rata-rata per baris dan bandingkan dengan rata-rata per kolom (variabel A, B, dan C).
+
+
+\>Ltest := readtable("test.csv", \>list);
+
+\>writetable(Ltest, wc=10, dc=5)
+
+
+     0.4101190650184269
+                 0.5587
+                0.71131
+                0.08435
+                0.32024
+                0.35331
+                0.43326
+                0.42489
+                0.02207
+                0.83867
+                0.42851
+                0.13575
+                0.21017
+                0.79345
+                0.63673
+                0.26416
+                0.51778
+                0.43523
+                0.42107
+                0.67072
+                0.82705
+                0.76206
+                0.47365
+                0.77061
+                0.59097
+                0.06381
+                0.16506
+                0.79632
+                0.71872
+                0.48673
+                0.27012
+                0.43012
+                0.17292
+                0.09764
+                0.99418
+                 0.0036
+                0.64797
+                0.52536
+                0.93325
+                0.74802
+                0.76336
+                0.57175
+                0.27595
+                0.28055
+                0.06647
+                0.22131
+                0.03729
+                0.45019
+                0.48702
+                0.52194
+                0.70323
+                0.38465
+                0.67908
+                0.12448
+                0.48925
+                0.36161
+                0.03035
+                0.57212
+                0.24575
+                0.19733
+                0.26546
+                 0.7911
+                0.27618
+                0.90897
+                0.64127
+                0.60245
+                0.70463
+                0.02124
+                0.46542
+                0.18176
+                0.14257
+                0.20675
+                0.85388
+                 0.9445
+                0.14201
+                0.21386
+                0.81877
+                0.53279
+                0.15392
+                0.45098
+                0.84472
+                0.55046
+                 0.3331
+                0.43418
+                 0.9044
+                0.35433
+                0.37311
+                0.26705
+                0.55354
+                0.34642
+                0.81199
+                0.31372
+                  0.195
+                0.43095
+                0.92029
+                0.26578
+                0.90759
+                0.36502
+                0.22186
+                0.74599
+                0.21065
+                0.44482
+                0.14871
+                0.00064
+                0.51492
+                0.70312
+                0.53813
+                0.78121
+                0.94993
+                0.42234
+                0.60922
+                0.95399
+                0.32425
+                0.35098
+                0.41357
+                0.81703
+                0.29661
+                0.86546
+                0.88382
+                0.27106
+                0.23117
+                0.39451
+                0.78045
+                0.58123
+                0.59305
+                0.24624
+                0.45543
+                 0.2267
+                0.96496
+                 0.0444
+                0.44541
+                0.81873
+                0.28414
+                0.92602
+                0.19514
+                 0.9534
+                0.18694
+                0.35976
+                0.80342
+                0.86719
+                0.21168
+                0.63995
+                0.61309
+                0.01442
+                0.42036
+                0.78157
+                0.68493
+                 0.3745
+                0.83271
+                0.49725
+                 0.0948
+                0.19894
+                0.70141
+                0.32048
+                0.94212
+                 0.2173
+                0.43127
+                0.82602
+                0.24128
+                0.77163
+                0.42034
+                0.77165
+                0.39202
+                0.90914
+                0.26374
+                0.44052
+                0.27069
+                0.18734
+                0.61404
+                0.69478
+                0.87101
+                0.19658
+                0.72914
+                0.39603
+                  0.074
+                0.45627
+                 0.3099
+                0.20093
+                0.13613
+                0.55962
+                0.18161
+                0.93586
+                0.17205
+                0.93828
+                0.30476
+                0.15597
+                0.60505
+                0.62898
+                0.72266
+                0.69179
+                 0.7325
+                0.24063
+                 0.2972
+                0.66111
+                 0.0501
+                0.20782
+                0.48433
+                  3e-05
+                0.07202
+                0.35864
+                0.04861
+                0.53792
+                0.75881
+                0.51352
+                0.65982
+                0.73227
+                0.96938
+                0.65159
+                 0.4774
+                0.13919
+                0.84931
+                 0.7068
+                0.60925
+                0.20371
+                0.66924
+                0.76474
+                0.43827
+                0.56148
+                0.67911
+                0.28169
+                0.24718
+                 0.6775
+                0.87452
+                0.20824
+                0.84551
+                0.48463
+                0.80572
+                0.97472
+                0.77116
+                0.63276
+                0.58055
+                0.85924
+                0.29943
+                0.56362
+                0.52726
+                0.61565
+                 0.5145
+                0.60412
+                0.71121
+                0.89384
+                0.69068
+                0.26314
+                0.53681
+                0.67097
+                0.33987
+                0.15187
+                0.68213
+                 0.6484
+                0.14433
+                0.96711
+                0.19802
+                0.86601
+                0.79106
+                0.27812
+                0.13962
+                0.62681
+                0.48911
+                0.22725
+                0.56868
+                0.02405
+                0.05766
+                0.16909
+                0.54794
+                0.29718
+                0.12318
+                0.58259
+                0.01799
+                0.88773
+                0.47928
+                0.19812
+                0.44525
+                0.26395
+                0.03457
+                0.73903
+                0.24403
+                0.32867
+                0.12252
+                0.69759
+                0.71634
+                0.72832
+                0.86188
+                0.53625
+                0.24789
+                0.94869
+                0.12655
+                0.97273
+                 0.2287
+                0.77207
+                0.67385
+                0.68382
+                0.85047
+                0.35718
+                 0.3035
+                 0.6972
+                0.60415
+                0.49155
+                0.35774
+                0.35145
+                0.63091
+                0.69015
+                0.22087
+                0.25391
+                0.63406
+                0.74115
+                0.92723
+                0.09549
+                0.07811
+                 0.6273
+                0.78512
+                0.32401
+                0.78812
+                0.55475
+                0.44203
+                0.94048
+                0.90644
+                 0.8643
+                0.32641
+                0.89346
+                0.86088
+                 0.4185
+                0.01193
+                0.66876
+                0.87865
+                0.95188
+                 0.7115
+                0.57199
+                 0.3281
+                0.39518
+                0.52377
+                0.81051
+                0.70374
+                0.67716
+                0.96361
+                0.39638
+                0.26059
+                0.94014
+                0.44531
+                0.72912
+                0.90752
+                0.79006
+                0.60803
+                0.90842
+                0.38994
+                0.87714
+                0.97041
+                0.08658
+                0.33838
+                0.22208
+                0.06078
+                 0.1223
+                 0.7529
+                0.21609
+                0.69722
+                0.47303
+                0.30979
+                0.38094
+                0.10714
+                0.59059
+                0.41323
+                0.47184
+                0.27146
+                0.58138
+                0.33532
+                0.66532
+                0.45113
+                 0.0012
+                0.33555
+                0.89794
+                0.10512
+                0.67997
+                0.95498
+                0.29536
+                0.78671
+                0.43568
+                0.42397
+                0.60044
+                0.20266
+                0.81802
+                0.25855
+                0.26044
+                0.08074
+                0.78476
+                0.83604
+                0.91765
+                0.14594
+                 0.4445
+                0.18337
+                0.43319
+                 0.3236
+                0.72698
+                0.50882
+                 0.7086
+                0.99816
+                  0.619
+                0.33422
+                0.98743
+                0.23137
+                0.44358
+                0.23033
+                0.03269
+                0.38728
+                 0.6041
+                0.81144
+                0.89902
+                0.06648
+                0.27577
+                0.70026
+                0.46736
+                0.00048
+                0.04902
+                0.85613
+                0.26975
+                0.37531
+                0.67439
+                0.24016
+                0.65702
+                0.27618
+                 0.5129
+                0.89715
+                0.74216
+                0.30882
+                0.67396
+                0.56136
+                 0.3897
+                0.68603
+                0.74959
+                0.09835
+                0.02088
+                0.02154
+                0.21725
+                0.69345
+                0.77591
+                0.20677
+                0.62491
+                0.81526
+                0.64092
+                0.58547
+                0.21339
+                 0.4438
+                 0.2603
+                 0.1629
+                0.01894
+                0.55107
+                0.04376
+                0.13962
+                0.59051
+                0.03592
+                0.11705
+                0.57782
+                0.68073
+                0.10121
+                0.80484
+                0.32259
+                0.28625
+                0.37408
+                0.35307
+                0.48769
+                0.80555
+                0.44448
+                0.25977
+                0.96265
+                0.82187
+                0.59134
+                0.74801
+                0.28482
+                 0.3884
+                0.83238
+                0.72927
+                0.54465
+                0.90146
+                0.70187
+                0.66798
+                0.05192
+                0.04401
+                0.50385
+                0.14949
+                0.83719
+                0.56776
+                0.77273
+                 0.6028
+                0.07324
+                0.56414
+                0.56219
+                0.90302
+                0.60694
+                0.36882
+                0.38396
+                0.38119
+                0.79758
+                0.47382
+                0.97763
+                0.21402
+                0.17063
+                0.82515
+                 0.8787
+                0.66207
+                0.77936
+                0.68978
+                0.25567
+                0.78385
+                0.72298
+                0.09469
+                0.41978
+                0.78875
+                0.05923
+                0.27787
+                0.61484
+                0.13985
+                0.74569
+                0.35024
+                0.86461
+                0.57213
+                0.04868
+                0.31851
+                0.44501
+                0.71481
+                0.78473
+                0.29405
+                0.95586
+                0.85572
+                0.12135
+                0.64329
+                0.67838
+                0.50846
+                0.91914
+                0.27543
+                0.43476
+                0.82144
+                0.44818
+                0.11114
+                0.86414
+                0.38968
+                0.24242
+                0.59466
+                0.61095
+                0.64663
+                0.51089
+                0.14791
+                0.14718
+                0.11176
+                0.56815
+                0.66784
+                0.66813
+                0.63602
+                 0.1091
+                0.85967
+                 0.9452
+                0.64071
+                 0.9651
+                0.21079
+                0.71015
+                 0.7205
+                0.16253
+                0.91714
+                0.63495
+                0.14967
+                0.31521
+                0.62749
+                0.47142
+                0.09502
+                0.62004
+                 0.9571
+                0.80072
+                0.33846
+                0.14635
+                0.56274
+                0.79772
+                0.79933
+                0.34125
+                0.78369
+                0.61203
+                0.27804
+                0.26972
+                0.53768
+                0.92622
+                 0.4373
+                0.09199
+                0.75895
+                0.52893
+                0.67132
+                0.02225
+                0.96523
+                0.64609
+                0.51263
+                0.54088
+                0.34374
+                0.71137
+                0.95408
+                0.01596
+                0.45725
+                0.61052
+                0.79699
+                0.64369
+                0.70184
+                0.57654
+                0.48628
+                0.04516
+                0.94729
+                0.14581
+                0.35404
+                0.50381
+                0.46135
+                0.11003
+                 0.0555
+                0.62254
+                0.90774
+                0.60092
+                0.10066
+                0.91573
+                0.23151
+                0.30343
+                0.10897
+                0.81195
+                0.94001
+                0.10378
+                0.59906
+                 0.9111
+                0.40263
+                0.67117
+                0.20535
+                0.38849
+                0.91188
+                0.32175
+                0.82597
+                0.96353
+                0.09667
+                0.13741
+                0.46562
+                0.24327
+                 0.8163
+                0.13481
+                0.08593
+                0.82045
+                0.21237
+                0.29022
+                0.45171
+                0.29982
+                0.67503
+                0.39234
+                0.50887
+                0.65351
+                0.07781
+                0.02373
+                0.38802
+                0.90768
+                 0.2939
+                  0.123
+                0.73025
+                0.69559
+                0.66676
+                0.46552
+                0.57249
+                0.60017
+                0.71688
+                0.37626
+                0.54598
+                0.73945
+                0.38398
+                0.88138
+                0.84237
+                0.10594
+                0.64965
+                0.77137
+                0.69013
+                0.81271
+                0.04582
+                0.96114
+                 0.5592
+                0.87491
+                0.43405
+                0.31982
+                0.11056
+                0.04552
+                0.34318
+                0.83012
+                0.05068
+                0.22565
+                0.86645
+                0.48969
+                0.05811
+                0.44091
+                0.52747
+                0.56234
+                0.47095
+                0.26828
+                0.46922
+                0.24828
+                0.98268
+                0.09553
+                0.08989
+                0.73391
+                0.70039
+                0.26773
+                0.37961
+                0.88444
+                0.63369
+                0.81857
+                0.62315
+                0.46946
+                0.46427
+                0.52774
+                0.63512
+                0.19071
+                 0.3998
+                0.57092
+                0.81809
+                0.22363
+                0.45835
+                0.13798
+                0.03529
+                0.99433
+                0.60024
+                0.79225
+                0.36581
+                0.51868
+                 0.6122
+                0.28825
+                0.99399
+                0.30006
+                0.93933
+                0.63022
+                0.00334
+                0.50663
+                 0.4198
+                0.22304
+                0.65013
+                0.91703
+                0.24236
+                0.85851
+                0.87217
+                0.87432
+                0.78105
+                0.47464
+                 0.8639
+                0.01567
+                0.67707
+                0.38918
+                0.49445
+                0.33531
+                0.26923
+                0.23598
+                0.98213
+                0.10796
+                 0.3025
+                0.45624
+                0.68641
+                0.27474
+                0.76738
+                0.47912
+                0.18969
+                0.10704
+                 0.4635
+                0.33725
+                0.00759
+                0.60392
+                0.48244
+                 0.2022
+                0.67361
+                0.01514
+                0.24985
+                0.42808
+                 0.9569
+                0.26538
+                0.86313
+                0.78123
+                0.33978
+                 0.5342
+                0.15454
+                0.21191
+                0.55475
+                0.88719
+                0.91771
+                0.86649
+                0.19651
+                 0.6245
+                0.97544
+                0.27278
+                0.16803
+                0.34629
+                0.23756
+                0.12047
+                 0.3864
+                0.81615
+                0.85042
+                0.97374
+                0.78244
+                0.50344
+                0.70754
+                0.66999
+                0.99523
+                 0.5826
+                0.44361
+                 0.2218
+                 0.7972
+                0.38628
+                0.73078
+                0.78725
+                0.16622
+                0.17875
+                0.83755
+                0.93766
+                0.86426
+                0.36919
+                0.60134
+                0.61869
+                0.47062
+                  0.831
+                0.36758
+                 0.1024
+                0.59262
+                0.91967
+                0.64147
+                0.13083
+                0.92996
+                0.33679
+                0.41956
+                0.85011
+                0.03456
+                0.76823
+                0.64722
+                0.76976
+                  0.764
+                0.21612
+                0.11115
+                0.56378
+                0.96347
+                 0.8613
+                0.90872
+                 0.0048
+                0.60933
+                0.64298
+                0.52664
+                0.18041
+                0.50565
+                0.36013
+                0.31877
+                0.07474
+                 0.4055
+                0.86108
+                0.40499
+                0.45738
+                0.80363
+                 0.8632
+                0.56482
+                0.48981
+                0.95199
+                 0.8107
+                0.94056
+                0.56633
+                0.03585
+                0.24676
+                0.19306
+                0.20327
+                0.97824
+                0.13368
+                0.72053
+                0.91277
+                0.93742
+                0.04161
+                0.73495
+                0.92153
+                0.31419
+                0.81124
+                0.52045
+                0.00491
+                0.52672
+                0.11463
+                0.20451
+                0.94158
+                0.20544
+                0.83474
+                0.88798
+                0.63234
+                0.46329
+                 0.8211
+                0.78467
+                0.86836
+                0.55716
+                 0.1553
+                 0.9319
+                0.84339
+                0.62169
+                0.98759
+                0.87265
+                0.58933
+                0.18988
+                0.90624
+                0.49654
+                 0.1011
+                0.32732
+                0.86567
+                0.18641
+                0.57867
+                0.29062
+                0.07976
+                 0.5855
+                0.96359
+                0.85654
+                0.32831
+                0.09815
+                0.25453
+                0.59058
+                0.24454
+                0.68372
+                 0.8252
+                0.32702
+                0.50136
+                0.58172
+                0.02845
+                0.72032
+                0.27668
+                 0.1313
+                0.84982
+                0.77608
+                0.32956
+                0.68574
+                0.42373
+                0.77217
+                0.11604
+                0.88614
+                0.18524
+                0.89964
+                0.33579
+                0.92642
+                0.55015
+                0.38363
+                0.22129
+                0.84452
+                0.54917
+                0.47611
+                0.71646
+                0.00705
+                0.99675
+                0.30675
+                  0.544
+                0.60421
+                0.41493
+                 0.0859
+                0.74041
+                0.41322
+                0.25054
+                0.15543
+                0.10655
+                0.98859
+                0.48475
+                0.07817
+                0.57911
+                0.46856
+                0.22056
+                0.22837
+                0.47473
+                 0.4261
+                0.43031
+                0.65175
+                0.42793
+                0.88514
+                0.73055
+                0.22365
+                0.72575
+                0.49576
+                0.48018
+                0.00309
+                0.08647
+                0.85575
+                0.90892
+                0.07298
+                0.37179
+                0.37218
+                0.83948
+                0.66896
+                0.87436
+                 0.1101
+                 0.0261
+                0.11599
+                 0.7387
+                0.98328
+                0.52913
+                0.48649
+                0.42214
+                0.02213
+                0.80101
+                0.29447
+                0.93451
+                0.80905
+                0.17398
+                0.34881
+                0.57503
+                0.62878
+                0.26418
+                 0.2944
+                0.10826
+                0.89957
+                 0.9728
+                0.13873
+                 0.3107
+                0.99431
+                0.27175
+                0.29715
+                0.30238
+                 0.5626
+
+\>mean(Ltest[1])
+
+
+    Real 999 x 1 matrix
+    
+           0.5587 
+         0.711308 
+        0.0843473 
+         0.320241 
+         0.353311 
+         0.433255 
+         0.424885 
+         0.022074 
+         0.838671 
+          0.42851 
+         0.135752 
+         0.210168 
+         0.793448 
+         0.636726 
+         0.264161 
+          0.51778 
+         0.435232 
+         0.421074 
+         0.670718 
+         0.827047 
+        ...
+
+\>mean((Ltest[1])')'
+
+
+    0.503487672774
+
+(3) Penjelasan Hasil Penyelesaian 
+
+
+- `readtable("test.csv", &gt;list)` memisahkan matriks numerik pada
+elemen pertama `Ltest[1]` dan nama kolom `["A", "B", "C"]` pada elemen
+kedua `Ltest[2]`. 
+
+
+- `mean(Ltest[1])` menghasilkan vektor kolom berisi rata-rata
+masing-masing dari 3 baris observasi, sedangkan `mean(Ltest[1]')'`
+menghasilkan vektor baris berisi rata-rata masing-masing kolom A, B,
+dan C.
+
+
