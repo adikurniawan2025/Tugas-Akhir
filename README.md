@@ -1,23 +1,21 @@
 # Portofolio Tugas Aplikasi Komputer (EMT & LaTeX)
 
-Repositori ini berisi kumpulan dokumen tugas mata kuliah **Aplikasi Komputer** menggunakan **Euler Math Toolbox (EMT)** dan **LaTeX**.
-
-## Identitas Mahasiswa
 * **Nama:** Adi Kurniawan
 * **NIM:** 25030630001
-* **Program Studi:** Matematika
-* **Fakultas:** Matematika dan Ilmu Pengetahuan Alam
+* **Program Studi:** Pendidikan Matematika
+* **Repositori:** [https://github.com/adikurniawan2025/Tugas-Akhir](https://github.com/adikurniawan2025/Tugas-Akhir)
+* **Halaman Web (GitHub Pages):** [https://adikurniawan2025.github.io/Tugas-Akhir/](https://adikurniawan2025.github.io/Tugas-Akhir/)
 
 ---
 
-## Daftar Tugas & Dokumen PDF
+## Daftar Tugas Praktikum
 
-| Pekan | Materi / Topik | Dokumen PDF | Folder Sumber |
-| :---: | :--- | :--- | :--- |
-| **Pekan 2** | Dasar-dasar Euler Math Toolbox (EMT) | [TugasAplikom2Adi25030630001..pdf](./Tugas2/TugasAplikom2Adi25030630001..pdf) | [Folder Tugas2](./Tugas2/) |
-| **Pekan 3** | Perhitungan Aljabar dengan EMT | [TugasAplikom3Adi25030630001_ - Copy.pdf](./Tugas3/TugasAplikom3Adi25030630001_%20-%20Copy.pdf) | [Folder Tugas3](./Tugas3/) |
-| **Pekan 4** | Plot 2D dengan EMT | [TugasAplikom4Adi25030630001. - Copy.pdf](./Tugas4/TugasAplikom4Adi25030630001.%20-%20Copy.pdf) | [Folder Tugas4](./Tugas4/) |
-| **Pekan 5** | Tugas Pekan 5 | [TugasAplikom5Adi25030630001_.pdf](./Tugas5/TugasAplikom5Adi25030630001_.pdf) | [Folder Tugas5](./Tugas5/) |
-| **Pekan 6** | Tugas Pekan 6 | [TugasAplikom6Adi25030630001_.pdf](./Tugas6/TugasAplikom6Adi25030630001_.pdf) | [Folder Tugas6](./Tugas6/) |
-| **Pekan 7** | Tugas Pekan 7 | [TugasAplikom7Adi25030630001_.pdf](./Tugas7/TugasAplikom7Adi25030630001_.pdf) | [Folder Tugas7](./Tugas7/) |
-| **Pekan 8** | Tugas Pekan 8 | [TugasAplikom8Adi25030630001_.pdf](./Tugas8/TugasAplikom8Adi25030630001_.pdf) | [Folder Tugas8](./Tugas8/) |
+| Pekan | Materi / Topik | Dokumen PDF |
+| :---: | :--- | :--- |
+| **Pekan 2** | Pengenalan Software Euler Math Toolbox (EMT) | [TugasAplikom2Adi25030630001.pdf](https://github.com/adikurniawan2025/Tugas-Akhir/blob/main/Tugas2/TugasAplikom2Adi25030630001.pdf) |
+| **Pekan 3-4** | Penggunaan Software EMT untuk Aljabar | [TugasAplikom3Adi25030630001%20Copy.pdf](https://github.com/adikurniawan2025/Tugas-Akhir/blob/main/Tugas3/TugasAplikom3Adi25030630001%20Copy.pdf) |
+| **Pekan 5-6** | Penggunaan Software EMT untuk Plot 2D | [TugasAplikom4Adi25030630001%20Copy.pdf](https://github.com/adikurniawan2025/Tugas-Akhir/blob/main/Tugas4/TugasAplikom4Adi25030630001%20Copy.pdf) |
+| **Pekan 7-8** | Penggunaan Software EMT untuk Plot 3D | [TugasAplikom5Adi25030630001.pdf](https://github.com/adikurniawan2025/Tugas-Akhir/blob/main/Tugas5/TugasAplikom5Adi25030630001.pdf) |
+| **Pekan 9-10** | Menggunakan EMT untuk Kalkulus | [TugasAplikom6Adi25030630001.pdf](https://github.com/adikurniawan2025/Tugas-Akhir/blob/main/Tugas6/TugasAplikom6Adi25030630001.pdf) |
+| **Pekan 11-12** | Menggunakan EMT untuk Geometri | [TugasAplikom7Adi25030630001.pdf](https://github.com/adikurniawan2025/Tugas-Akhir/blob/main/Tugas7/TugasAplikom7Adi25030630001.pdf) |
+| **Pekan 13-14** | Menggunakan EMT untuk Statistika | [TugasAplikom8Adi25030630001.pdf](https://github.com/adikurniawan2025/Tugas-Akhir/blob/main/Tugas8/TugasAplikom8Adi25030630001.pdf) |
