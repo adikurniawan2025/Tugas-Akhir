@@ -10,12 +10,12 @@
 
 ## Daftar Tugas Praktikum
 
-| Pekan | Materi / Topik | Dokumen PDF |
+| Pekan | Materi / Topik | Folder & Dokumen Tugas |
 | :---: | :--- | :--- |
-| **Pekan 2** | Pengenalan Software Euler Math Toolbox (EMT) | [TugasAplikom2Adi25030630001.pdf](https://github.com/adikurniawan2025/Tugas-Akhir/blob/main/Tugas2/TugasAplikom2Adi25030630001.pdf) |
-| **Pekan 3-4** | Penggunaan Software EMT untuk Aljabar | [TugasAplikom3Adi25030630001%20Copy.pdf](https://github.com/adikurniawan2025/Tugas-Akhir/blob/main/Tugas3/TugasAplikom3Adi25030630001%20Copy.pdf) |
-| **Pekan 5-6** | Penggunaan Software EMT untuk Plot 2D | [TugasAplikom4Adi25030630001%20Copy.pdf](https://github.com/adikurniawan2025/Tugas-Akhir/blob/main/Tugas4/TugasAplikom4Adi25030630001%20Copy.pdf) |
-| **Pekan 7-8** | Penggunaan Software EMT untuk Plot 3D | [TugasAplikom5Adi25030630001.pdf](https://github.com/adikurniawan2025/Tugas-Akhir/blob/main/Tugas5/TugasAplikom5Adi25030630001.pdf) |
-| **Pekan 9-10** | Menggunakan EMT untuk Kalkulus | [TugasAplikom6Adi25030630001.pdf](https://github.com/adikurniawan2025/Tugas-Akhir/blob/main/Tugas6/TugasAplikom6Adi25030630001.pdf) |
-| **Pekan 11-12** | Menggunakan EMT untuk Geometri | [TugasAplikom7Adi25030630001.pdf](https://github.com/adikurniawan2025/Tugas-Akhir/blob/main/Tugas7/TugasAplikom7Adi25030630001.pdf) |
-| **Pekan 13-14** | Menggunakan EMT untuk Statistika | [TugasAplikom8Adi25030630001.pdf](https://github.com/adikurniawan2025/Tugas-Akhir/blob/main/Tugas8/TugasAplikom8Adi25030630001.pdf) |
+| **Pekan 2** | Pengenalan Software Euler Math Toolbox (EMT) | [Buka Folder & PDF Tugas 2](https://github.com/adikurniawan2025/Tugas-Akhir/tree/main/Tugas2) |
+| **Pekan 3-4** | Penggunaan Software EMT untuk Aljabar | [Buka Folder & PDF Tugas 3](https://github.com/adikurniawan2025/Tugas-Akhir/tree/main/Tugas3) |
+| **Pekan 5-6** | Penggunaan Software EMT untuk Plot 2D | [Buka Folder & PDF Tugas 4](https://github.com/adikurniawan2025/Tugas-Akhir/tree/main/Tugas4) |
+| **Pekan 7-8** | Penggunaan Software EMT untuk Plot 3D | [Buka Folder & PDF Tugas 5](https://github.com/adikurniawan2025/Tugas-Akhir/tree/main/Tugas5) |
+| **Pekan 9-10** | Menggunakan EMT untuk Kalkulus | [Buka Folder & PDF Tugas 6](https://github.com/adikurniawan2025/Tugas-Akhir/tree/main/Tugas6) |
+| **Pekan 11-12** | Menggunakan EMT untuk Geometri | [Buka Folder & PDF Tugas 7](https://github.com/adikurniawan2025/Tugas-Akhir/tree/main/Tugas7) |
+| **Pekan 13-14** | Menggunakan EMT untuk Statistika | [Buka Folder & PDF Tugas 8](https://github.com/adikurniawan2025/Tugas-Akhir/tree/main/Tugas8) |
