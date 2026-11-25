@@ -10,7 +10,7 @@
 
 ## Daftar Tugas Praktikum
 
-| Pekan | Materi / Topik | Folder & Dokumen Tugas |
+| Pekan | Materi / Topik | Tautan Folder Tugas |
 | :---: | :--- | :--- |
 | **Pekan 2** | Pengenalan Software Euler Math Toolbox (EMT) | [Buka Folder & PDF Tugas 2](https://github.com/adikurniawan2025/Tugas-Akhir/tree/main/Tugas2) |
 | **Pekan 3-4** | Penggunaan Software EMT untuk Aljabar | [Buka Folder & PDF Tugas 3](https://github.com/adikurniawan2025/Tugas-Akhir/tree/main/Tugas3) |
