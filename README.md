@@ -2,7 +2,7 @@
 
 * **Nama:** Adi Kurniawan
 * **NIM:** 25030630001
-* **Program Studi:** Pendidikan Matematika
+* **Program Studi:** Matematika
 * **Repositori:** [https://github.com/adikurniawan2025/Tugas-Akhir](https://github.com/adikurniawan2025/Tugas-Akhir)
 * **Halaman Web (GitHub Pages):** [https://adikurniawan2025.github.io/Tugas-Akhir/](https://adikurniawan2025.github.io/Tugas-Akhir/)
 
