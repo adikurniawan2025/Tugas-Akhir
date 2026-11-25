@@ -3,72 +3,265 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tugas Akhir Aplikasi Komputer - Adi Kurniawan</title>
+  <title>Portofolio Aplikasi Komputer - Adi Kurniawan</title>
   <style>
-    body { font-family: system-ui, -apple-system, sans-serif; max-width: 820px; margin: 40px auto; padding: 0 20px; line-height: 1.6; color: #24292f; }
-    h1 { border-bottom: 2px solid #d0d7de; padding-bottom: 10px; }
-    .info { background: #f6f8fa; padding: 14px 18px; border-radius: 6px; border: 1px solid #d0d7de; margin-bottom: 24px; }
-    table { width: 100%; border-collapse: collapse; margin-top: 12px; }
-    th, td { border: 1px solid #d0d7de; padding: 10px 12px; text-align: left; }
-    th { background-color: #f6f8fa; }
-    td:first-child { text-align: center; font-weight: 600; white-space: nowrap; }
-    a { color: #0969da; text-decoration: none; font-weight: 500; }
-    a:hover { text-decoration: underline; }
+    :root {
+      --primary: #0969da;
+      --primary-hover: #0550ae;
+      --bg: #f6f8fa;
+      --surface: #ffffff;
+      --border: #d0d7de;
+      --text: #1f2328;
+      --muted: #656d76;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 32px 16px;
+      line-height: 1.6;
+    }
+    .container {
+      max-width: 920px;
+      margin: 0 auto;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 32px;
+      box-shadow: 0 4px 12px rgba(31, 35, 40, 0.04);
+    }
+    header {
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 20px;
+      margin-bottom: 24px;
+    }
+    h1 {
+      margin: 0 0 8px 0;
+      font-size: 1.75rem;
+      color: var(--text);
+    }
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+      font-size: 1rem;
+    }
+    .profile-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin-bottom: 28px;
+      font-size: 0.95rem;
+    }
+    .profile-item span {
+      display: block;
+      font-size: 0.8rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    h2 {
+      font-size: 1.25rem;
+      margin: 0 0 14px 0;
+    }
+    .table-wrapper {
+      overflow-x: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+    }
+    th, td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+    }
+    th {
+      background: var(--bg);
+      font-weight: 600;
+      color: var(--muted);
+      font-size: 0.85rem;
+      text-transform: uppercase;
+    }
+    tr:hover td {
+      background-color: #f9fbfd;
+    }
+    .badge {
+      display: inline-block;
+      background: #ddf4ff;
+      color: #0969da;
+      font-weight: 600;
+      font-size: 0.82rem;
+      padding: 3px 10px;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+    .actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .btn {
+      display: inline-block;
+      padding: 5px 12px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      text-decoration: none;
+      transition: 0.15s ease;
+    }
+    .btn-primary {
+      background: var(--primary);
+      color: #ffffff;
+    }
+    .btn-primary:hover {
+      background: var(--primary-hover);
+    }
+    .btn-outline {
+      border: 1px solid var(--border);
+      color: var(--text);
+      background: #ffffff;
+    }
+    .btn-outline:hover {
+      background: var(--bg);
+    }
+    footer {
+      margin-top: 28px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+      font-size: 0.85rem;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    footer a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+    footer a:hover {
+      text-decoration: underline;
+    }
   </style>
 </head>
 <body>
-  <h1>Portofolio Tugas Aplikasi Komputer (EMT &amp; LaTeX)</h1>
-  <div class="info">
-    <strong>Nama:</strong> Adi Kurniawan<br>
-    <strong>NIM:</strong> 25030630001<br>
-    <strong>Repositori GitHub:</strong> <a href="https://github.com/adikurniawan2025/Tugas-Akhir">github.com/adikurniawan2025/Tugas-Akhir</a>
+  <div class="container">
+    <header>
+      <h1>Portofolio Tugas Aplikasi Komputer</h1>
+      <p class="subtitle">Dokumentasi Praktikum Euler Math Toolbox (EMT) &amp; LaTeX</p>
+    </header>
+
+    <div class="profile-grid">
+      <div class="profile-item">
+        <span>Nama Mahasiswa</span>
+        <strong>Adi Kurniawan</strong>
+      </div>
+      <div class="profile-item">
+        <span>NIM</span>
+        <strong>25030630001</strong>
+      </div>
+      <div class="profile-item">
+        <span>Program Studi</span>
+        <strong>Pendidikan Matematika</strong>
+      </div>
+    </div>
+
+    <h2>Daftar Laporan Praktikum (Pekan 2 – 14)</h2>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Pekan</th>
+            <th>Materi / Topik Praktikum</th>
+            <th>Tautan Berkas</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="badge">Pekan 2</span></td>
+            <td>Pengenalan Software Euler Math Toolbox (EMT)</td>
+            <td>
+              <div class="actions">
+                <a class="btn btn-primary" href="https://github.com/adikurniawan2025/Tugas-Akhir/blob/main/Tugas2/TugasAplikom2Adi25030630001..pdf" target="_blank">Buka PDF</a>
+                <a class="btn btn-outline" href="https://github.com/adikurniawan2025/Tugas-Akhir/tree/main/Tugas2" target="_blank">Folder Tugas2</a>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td><span class="badge">Pekan 3-4</span></td>
+            <td>Penggunaan Software EMT untuk Aljabar</td>
+            <td>
+              <div class="actions">
+                <a class="btn btn-primary" href="https://github.com/adikurniawan2025/Tugas-Akhir/blob/main/Tugas3/TugasAplikom3Adi25030630001_%20-%20Copy.pdf" target="_blank">Buka PDF</a>
+                <a class="btn btn-outline" href="https://github.com/adikurniawan2025/Tugas-Akhir/tree/main/Tugas3" target="_blank">Folder Tugas3</a>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td><span class="badge">Pekan 5-6</span></td>
+            <td>Penggunaan Software EMT untuk Plot 2D</td>
+            <td>
+              <div class="actions">
+                <a class="btn btn-primary" href="https://github.com/adikurniawan2025/Tugas-Akhir/blob/main/Tugas4/TugasAplikom4Adi25030630001.%20-%20Copy.pdf" target="_blank">Buka PDF</a>
+                <a class="btn btn-outline" href="https://github.com/adikurniawan2025/Tugas-Akhir/tree/main/Tugas4" target="_blank">Folder Tugas4</a>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td><span class="badge">Pekan 7-8</span></td>
+            <td>Penggunaan Software EMT untuk Plot 3D</td>
+            <td>
+              <div class="actions">
+                <a class="btn btn-primary" href="https://github.com/adikurniawan2025/Tugas-Akhir/blob/main/Tugas5/TugasAplikom5Adi25030630001_.pdf" target="_blank">Buka PDF</a>
+                <a class="btn btn-outline" href="https://github.com/adikurniawan2025/Tugas-Akhir/tree/main/Tugas5" target="_blank">Folder Tugas5</a>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td><span class="badge">Pekan 9-10</span></td>
+            <td>Menggunakan EMT untuk Kalkulus</td>
+            <td>
+              <div class="actions">
+                <a class="btn btn-primary" href="https://github.com/adikurniawan2025/Tugas-Akhir/blob/main/Tugas6/TugasAplikom6Adi25030630001_.pdf" target="_blank">Buka PDF</a>
+                <a class="btn btn-outline" href="https://github.com/adikurniawan2025/Tugas-Akhir/tree/main/Tugas6" target="_blank">Folder Tugas6</a>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td><span class="badge">Pekan 11-12</span></td>
+            <td>Menggunakan EMT untuk Geometri</td>
+            <td>
+              <div class="actions">
+                <a class="btn btn-primary" href="https://github.com/adikurniawan2025/Tugas-Akhir/blob/main/Tugas7/TugasAplikom7Adi25030630001_.pdf" target="_blank">Buka PDF</a>
+                <a class="btn btn-outline" href="https://github.com/adikurniawan2025/Tugas-Akhir/tree/main/Tugas7" target="_blank">Folder Tugas7</a>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td><span class="badge">Pekan 13-14</span></td>
+            <td>Menggunakan EMT untuk Statistika</td>
+            <td>
+              <div class="actions">
+                <a class="btn btn-primary" href="https://github.com/adikurniawan2025/Tugas-Akhir/blob/main/Tugas8/TugasAplikom8Adi25030630001_.pdf" target="_blank">Buka PDF</a>
+                <a class="btn btn-outline" href="https://github.com/adikurniawan2025/Tugas-Akhir/tree/main/Tugas8" target="_blank">Folder Tugas8</a>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <footer>
+      <span>Universitas Negeri Yogyakarta &bull; Mata Kuliah Aplikasi Komputer</span>
+      <a href="https://github.com/adikurniawan2025/Tugas-Akhir" target="_blank">Lihat Repositori GitHub &rarr;</a>
+    </footer>
   </div>
-  <h2>Daftar Tugas Praktikum</h2>
-  <table>
-    <thead>
-      <tr>
-        <th style="text-align: center;">Pekan</th>
-        <th>Materi / Topik</th>
-        <th>Tautan Repositori</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>Pekan 2</td>
-        <td>Pengenalan Software Euler Math Toolbox (EMT)</td>
-        <td><a href="https://github.com/adikurniawan2025/Tugas-Akhir/tree/main/Tugas2">Buka Folder &amp; PDF Tugas 2</a></td>
-      </tr>
-      <tr>
-        <td>Pekan 3-4</td>
-        <td>Penggunaan Software EMT untuk Aljabar</td>
-        <td><a href="https://github.com/adikurniawan2025/Tugas-Akhir/tree/main/Tugas3">Buka Folder &amp; PDF Tugas 3</a></td>
-      </tr>
-      <tr>
-        <td>Pekan 5-6</td>
-        <td>Penggunaan Software EMT untuk Plot 2D</td>
-        <td><a href="https://github.com/adikurniawan2025/Tugas-Akhir/tree/main/Tugas4">Buka Folder &amp; PDF Tugas 4</a></td>
-      </tr>
-      <tr>
-        <td>Pekan 7-8</td>
-        <td>Penggunaan Software EMT untuk Plot 3D</td>
-        <td><a href="https://github.com/adikurniawan2025/Tugas-Akhir/tree/main/Tugas5">Buka Folder &amp; PDF Tugas 5</a></td>
-      </tr>
-      <tr>
-        <td>Pekan 9-10</td>
-        <td>Menggunakan EMT untuk Kalkulus</td>
-        <td><a href="https://github.com/adikurniawan2025/Tugas-Akhir/tree/main/Tugas6">Buka Folder &amp; PDF Tugas 6</a></td>
-      </tr>
-      <tr>
-        <td>Pekan 11-12</td>
-        <td>Menggunakan EMT untuk Geometri</td>
-        <td><a href="https://github.com/adikurniawan2025/Tugas-Akhir/tree/main/Tugas7">Buka Folder &amp; PDF Tugas 7</a></td>
-      </tr>
-      <tr>
-        <td>Pekan 13-14</td>
-        <td>Menggunakan EMT untuk Statistika</td>
-        <td><a href="https://github.com/adikurniawan2025/Tugas-Akhir/tree/main/Tugas8">Buka Folder &amp; PDF Tugas 8</a></td>
-      </tr>
-    </tbody>
-  </table>
 </body>
 </html>
